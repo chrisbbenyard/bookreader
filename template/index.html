@@ -1,0 +1,71 @@
+﻿<html>  
+  <head>
+    <title>ReadTxT - 网络小说一站式阅读</title>
+    <meta name="viewport" content="width=device-width" /> 
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href="/ip-icon.png">    
+    <link rel="shortcut icon" href="/favicon.ico" />
+  </head>  
+  
+  <body>
+    <p>
+      欢迎 {{ nickname }}
+      <a href="{{ logout_url }}">更换用户</a>
+      <a href='/user'>用户信息</a>
+      <br/>
+      <a href="/quickupdate">快速更新</a>
+      <a href="/bookmarks">书签管理</a>
+      <a href='/books'>书籍管理</a>      
+      <a href="/help.html">帮助</a>
+    </p>
+    
+    {% if not bookmarks %}
+      <p>
+        您的书签列表为空，点击“<a href="/bookmarks">书签管理</a>”添加。
+      </p>
+      <p>
+        <a href="/help.html#guide">快速浏览功能介绍？</a>
+      </p>
+    {% endif %}
+    
+    <table>
+      {% for book in bookmarks %}      
+        <tr>
+          <td colspan="2"><b>{{ book.title }}</b>
+          {% if book.author %}
+            - {{ book.author }}
+          {% endif %} 
+          </td>
+        </tr>
+        <tr>
+          <td>阅读:
+            <a href="{{ book.read_link }}">
+              {% if book.chapter_title %}
+                {{ book.chapter_title }}
+              {% else %}
+                未获取章节名
+              {% endif %}              
+            </a>
+           </td>
+        </tr>
+        <tr>
+          <td>更新:                   
+            {% if book.next_link %}
+              <a href="{{ book.next_link }}">下章</a>
+            {% else %}
+              无公开章节
+            {% endif %}
+            {% if book.update_date %}
+              ({{ book.update_date }})
+            {% endif %}            
+          </td>       
+        </tr>
+        <tr style="height:1em;"></tr>
+      {% endfor %}
+    </table>
+
+  
+
+    
+  </body>
+</html>
