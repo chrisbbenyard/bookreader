@@ -1,0 +1,29 @@
+﻿<html>
+  <head>
+    <title>ReadTxT - 导出书签</title>
+    <meta name="viewport" content="width=device-width" />   
+    <link rel="shortcut icon" href="/favicon.ico" />
+   </head>  
+  <body>
+  
+    <p>
+      <a href="/">首页</a>
+      <a href="/bookmarks">书签管理</a>
+      <a href="/help.html">帮助</a>
+    </p>
+    
+
+    <table>
+      {% for book in bookmarks %}      
+        <tr>
+          <td colspan="1"><b>{{ book.title }}</b></td>
+        </tr>
+        <tr>
+          <td>{{ book.chapter_url_prefix }}{{ book.curr_url }}</td>
+        </tr>
+        <tr style="height:1em;"></tr>
+      {% endfor %}
+    </table>
+
+  </body>
+</html>

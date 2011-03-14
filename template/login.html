@@ -1,0 +1,44 @@
+﻿<html>
+  
+  <head>
+    <title>ReadTxT - 登录</title>
+    <meta name="viewport" content="width=device-width" />   
+    <link rel="shortcut icon" href="/favicon.ico" />
+  </head>  
+
+
+  <body>
+
+  <p>
+    <a href="/">首页</a>
+    <a href="/help.html">帮助</a>
+  </p>
+  <p>
+    欢迎使用 ReadTxT，本应用的设计致力于使大家阅读互联网章回体连载通俗文学更加方便快捷。为保存您个性化的书目，首先需要登录。要了解更多，请查看<a href="/help.html">帮助</a>。
+  </p>
+  
+  <h2>登录方式一：</h2>
+  <p>
+    <a href="{{ google_url }}">使用 Google 账户登录</a>
+  </p>
+  <p>
+    <small>
+    本应用由 Google App Engine 提供支持，因此您可以安全地使用 Google 账户。
+    </small>
+  </p>
+
+  
+  <h2>登录方式二：</h2>
+  
+  <p>还可以使用 User Key 的方式登录:</p>
+  <form method="post" action="/login">
+      <input type="text" id="user_key" name="user_key" style="width:250">
+      <input type="submit" value="UserKey登录">
+  </form>
+  <p>
+    <small>
+    如果您没有 Google 账户，或者登录出现问题，可以采用这种不需要密码的方式。再次登录时使用本次输入的 User Key 即可。想要进一步<a href="/help.html#login">了解 User Key</a>？</p>
+    </small>
+  </p>  
+  </body>
+</html>

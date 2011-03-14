@@ -1,0 +1,50 @@
+﻿<html>
+  <head>
+    <title>ReadTxT - 书籍管理</title>
+    <meta name="viewport" content="width=device-width" />   
+    <link rel="shortcut icon" href="/favicon.ico" />
+  </head>  
+  
+  <body>
+  
+    <p>
+      <a href="/admin ">管理员首页</a>
+      <a href="/admin/users">用户管理</a>
+      <a href='/admin/books'>书籍管理</a>      
+    </p>
+    <table>
+    {% for book in booklist %}      
+      <tr>
+        <td colspan="4">{{ book.title }}</b> - {{ book.author }}
+        <a href="{{ book.delete_link }}">删除本书</a></td>
+      </tr>      
+      {% for catalog in book.catalogs %}     
+      <tr>
+        <td>
+          {{ catalog.site }}
+        </td>
+        <td>
+          {{ catalog.user_number }}个用户
+        </td>
+        <td>
+          {{ catalog.chapter_number }}章
+        </td>
+        <td>
+          <a href="{{ catalog.delete_link }}" title="{{ catalog.user_list }}">删除</a>
+        </td>     
+      {% endfor %}
+      <tr style="height:1em;"></tr>
+     
+    {% endfor %}
+    </table>
+
+    <p>-----</p>
+    <form action="/addbook/" method="post">   
+      地址：<br/>
+      <input type="text" id="chapter_url" name="chapter_url" style="width:250">
+      <input type="submit" value="加入新书"><br/>
+      </table>    
+    </form>
+
+  </body>
+</html>

@@ -1,0 +1,127 @@
+﻿<html>  
+  <head>
+    <title>ReadTxT - 网络小说一站式阅读</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width" />   
+    <link rel="shortcut icon" href="/favicon.ico" />
+  </head>  
+<body>
+
+<p>
+  <a href="/">返回首页</a>
+</p>
+      
+<h1 class="page_title">关于 ReadTxT 的一般问题</h1>
+
+<ul>
+  <li><a href="#what">ReadTxT 是做什么的？</a></li>
+  <li><a href="#login">为什么要登录？User Key 登录是什么？</a></li>
+  <li><a href="#guide">有什么基本功能？</a></li>
+  <li><a href="#usefulness">有的网站已经提供书架功能，ReadTxT 还有必要吗？</a></li>
+  <li><a href="#interface">界面怎么这么难看？</a></li>
+  <li><a href="#addbook">如何添加一本书？我怎么知道写什么地址？</a></li>
+  <li><a href="#support">支持哪些网站？</a></li>
+  <li><a href="#update">如何获取最新章节？</a></li>
+  <li><a href="#subscribe">如何使用 Feed 订阅某一本书？</a></li>
+  <li><a href="#finderror">书的信息获取不对？</a></li>
+
+</ul>
+
+
+<a name="what" id="what"></a>
+<h2>ReadTxT 是做什么的？</h2>
+<p>
+  ReadTxT 是为了使阅读网络小说更方便而设计的。它支持常见的网络文学站点，比如：起点中文网、飞库电子书等。用户可以在登录后统一管理各个站点自己喜欢的书目，并保存阅读书签，实现一站式阅读。自动抓取最新的章节。
+</p>
+
+<a name="login" id="login"></a>
+<h2>为什么要登录？User Key 登录是什么？</h2>
+<p>
+  因为要保存您的个性化书目，所以需要您登录 ReadTxT。本应用是由 Google App Engine 驱动，所以最佳的登录方式是使用 Google 账户。但是考虑到并不是所有人都有 Google 账户以及有的手机浏览器不支持网站登录等原因，本站还设计了一种 User Key 的登录方式。用户只要随意输入一串字符 (称为 User Key) 就可以登录网站，之后登录只要使用同一个 User Key 即可。不过这种方式因为不需要密码，其他人使用您定义的 User Key 也可以查看管理您的书目，因此建议您选择一个稍复杂些的 User Key。
+</p>
+
+<a name="guide" id="guide"></a>
+<h2>有什么基本功能？</h2>
+<p>
+<p>
+  目前的功能有：
+  <ul>
+    <li>添加新书：首页 -> 书签管理，下方的输入框输入书的地址。</li>
+    <li>订阅 Feed：首页 -> 书籍管理 -> 订阅更新，目前只支持 Google Reader，通过复制链接添加，直接点击是打不开的。</li>
+    <li>导出/导入书签：首页 -> 书签管理 -> 上方的“导出书签/批量加入”。</li>
+    <li>阅读：在首页点击相应链接。</li>
+    <li>查看目录：在书签管理或者章节阅读界面选择“目录”。</li>
+    <li>更新：自动后台更新，心急的也可以点击首页的快速更新。</li>
+  </ul>
+</p>
+</p>
+
+
+<a name="usefulness" id="usefulness"></a>
+<h2>有的网站已经提供书架功能，ReadTxT 还有必要吗？</h2>
+<p>
+  不同网站相互独立，用户需要在多个网站之间进行切换，十分不便。本应用就是统一管理用户阅读的书籍，并保存在网上，只要登录即可随时观看并保存阅读进度。
+</p>
+
+<a name="interface" id="interface"></a>
+<h2>界面怎么这么难看？</h2>
+<p>
+  ReadTxT 在设计的时候考虑到手机用户的阅读习惯，为了节省流量和操作方便，采用朴素的界面设计。
+</p>
+
+
+
+<a name="addbook" id="addbook"></a>
+<h2>如何添加一本书？我怎么知道写什么地址？</h2>
+<p>
+  首先从<a href="#support">目前支持的网站</a>中找到您喜欢看的书，然后将书页或者目录页或者具体某一章的地址复制到本应用“书签管理”页面下方的输入框即可。
+</p>
+
+<a name="support" id="support"></a>
+<h2>支持哪些网站？</h2>
+<p>
+  目前支持网站：
+  <ul>
+    <li><a href="http://www.qidian.com">起点中文网</a></li>
+    <li><a href="http://www.zongheng.com/">纵横中文网</a></li>
+    <li><a href="http://www.feiku.com/index.html">飞库网</a></li>
+    <li><a href="http://www.bingdi.com">冰地小说</a>(醉露书院,涅破小说)</li>
+    <li><a href="http://www.101du.net/">沸腾文学</a></li>
+    <li><a href="http://www.16kxs.com/">16K小说网</a></li>
+    <li><a href="http://www.lxwxw.com/">理想文学网</a></li>
+  </ul>
+</p>
+
+<a name="update" id="update"></a>
+<h2>如何获取最新章节？</h2>
+<p>
+ 所有书目都会在后台自动抓取最新章节，您只要刷新首页查看是否有“下章”链接即可。在首页可以通过“快速更新”自动寻找更新章节，这个操作在后台立即执行，反应到书签变化需要约10秒的时间。如果想要单独更新一本书，可以在“书签管理”中选择“更新”。此外，两次更新的间隔设置为不能少于10分钟。
+</p>
+
+<a name="subscribe" id="subscribe"></a>
+<h2>如何使用 Feed 订阅某一本书？</h2>
+<p>
+在“书籍管理”的页面可以看到“订阅更新”的链接，每一本书在每一个网站上的更新都有独立的 Feed。将这个地址通过右键复制链接的方式复制到 Google Reader 的添加订阅按钮。注意，因为提供的 Feed 太多，为了减轻服务器压力，只允许使用 Google Reader 订阅，除此以外的在线、离线阅读器都会显示找不到网页。
+</p>
+
+<a name="finderror" id="finderror"></a>
+<h2>书的信息获取不对？</h2>
+<p>
+  有的时候书籍的内容获取不全或者在添加书本、阅读章节的时候出问题，有如下可能：
+  <ul>
+    <li>书籍如果是刚刚添加，则信息可能不全，在“更新”重新获取即可。</li>
+    <li>原始网站如果访问过慢或者无法连接，则本应用无法获取书籍信息和最新章节，请稍后重试。</li>
+    <li>有的网站本身对某些书显示有问题，比如飞库网某些书已经转移到冰地或者醉露，找到正确的书籍网址后添加。</li>
+    <li>原始网站进行了修改，比如网站升级等，则请联系本应用开发者进行更新支持。</li>
+  </ul>
+  
+</p>
+
+
+<p>
+  <a href="/">首页</a>
+</p>
+
+
+</body>
+</html>

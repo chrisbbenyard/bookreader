@@ -1,0 +1,54 @@
+﻿<html>  
+  <head>
+    <title>ReadTxT - 书签管理</title>
+    <meta name="viewport" content="width=device-width" />   
+    <link rel="shortcut icon" href="/favicon.ico" />
+   </head>  
+   
+  <body>
+  
+    <p>
+      <a href="/">首页</a>
+      <a href="/export">导出书签</a>
+      <a href="/import">批量加入</a>
+      <a href="/help.html">帮助</a>
+    </p>
+    
+    
+    <table>
+      {% for book in bookmarks %}      
+        <tr>
+          <td colspan="4"><b>
+            {{ book.title }}</b>-{{ book.site }}             
+              {% if book.chapter_title %}
+                ({{ book.chapter_title }})
+              {% else %}
+                (未获取章节名)
+              {% endif %}              
+         </td>
+        </tr>
+        <tr>          
+          <td>
+            <a href="{{ book.read_link }}">阅读</a>
+            <a href="{{ book.update_link }}">更新</a>
+            <a href="{{ book.catalog_link }}">目录</a>
+            <a href="{{ book.delete_link }}">删除</a>
+          </td>
+        </tr>
+        <tr style="height:1em;"></tr>
+      {% endfor %}
+    </table>
+
+    <p>-----</p>
+    <form action="/addbook/" method="post">   
+      地址：<br/>
+      <input type="text" id="chapter_url" name="chapter_url" style="width:250">
+      <input type="submit" value="加入新书"><br/>
+      </table>    
+    </form>
+    <p>-----</p>
+    <p>
+      <a href="/help.html#support">目前支持的网站</a>
+    </p>  
+  </body>
+</html>
