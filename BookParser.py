@@ -1018,10 +1018,10 @@ def zongheng_parse_catalog(catalog_url):
     li_list = ul_list[i].findAll('td')
     for j in li_list:
       if j.a != None and unicode(j.a).find('[VIP]')==-1: # 跳过VIP章节
-        url = j.a['chapterid']
-        url = url + '.html'
-        title = unicode(j.a.contents[0])
-        chapter_url_list.append(url) 
+        url = j.a['href']
+        url = url[url.rfind('/')+1:]
+        title = unicode(j.a.string)
+        chapter_url_list.append( url ) 
         chapter_title_list.append( title )
         
   put_into_dict(parse_result, 'chapter_url_list', chapter_url_list)
