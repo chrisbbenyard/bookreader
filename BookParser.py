@@ -560,8 +560,7 @@ def niepo_parse_catalog(catalog_url):
 #---------------------------------------------------------
 
 
-def lxwxw_parse_book(book_url):
-  main_url = 'http://www.lxwxw.com'
+def to92_parse_book(book_url):  
 
   fetch_result = urlfetch.fetch(book_url, allow_truncated=True)
   parse_result = { }
@@ -569,25 +568,23 @@ def lxwxw_parse_book(book_url):
   html = fetch_result.content.decode('gbk', 'ignore')
   document = BSXPathEvaluator(html)
    
-  title_xpath = '/html/body/div/div/div[5]/div[3]/div[2]/div/div/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/h1'
-  title = get_xpath_string(document, title_xpath)
-  title_re = re.compile(u'《(.*)》')
-  put_into_dict(parse_result, 'title', get_re_first(title, title_re))
+  title_xpath = "//div[@id='bookTitle']/h1"  
+  put_into_dict(parse_result, 'title', get_xpath_string(document, title_xpath))
   
-  temp_xpath = '/html/body/div/div/div[5]/div[3]/div[2]/div/div/table/tbody/tr'
+  temp_xpath = '/html/body'
   temp_html = get_xpath_unicode(document, temp_xpath)
   
   if temp_html:  
-    author_re = re.compile(u'者：\s*([^<]*)</td>') # 名字应该没"<"吧
+    author_re = re.compile(u'作者：\s*([^&]*)&nbsp;') # 名字应该没"&nbsp;"吧
     put_into_dict(parse_result, 'author', get_re_first(temp_html, author_re))
 
-    update_date_re = re.compile(u'更新：\s*(\d*)-(\d*)-(\d*)') 
+    update_date_re = re.compile(u'<span id="lbAddTime">\s*(\d*)-(\d*)-(\d*)</span>') 
     update_date = get_re_first(temp_html, update_date_re)
     if update_date:
       (y, m, d) = update_date
       put_into_dict(parse_result, 'update_date', datetime.datetime(int(y), int(m), int(d)) + datetime.timedelta(hours=-8))
   
-  last_url_xpath = '/html/body/div/div/div[5]/div[3]/div[2]/div/div/table/tbody/tr[4]/td/table/tbody/tr[2]/td[2]/a'  
+  last_url_xpath = "//a[@id='hlLastChapter']"  
   last_url = get_xpath_attr(document, last_url_xpath, 'href')
   if last_url:
     pos = last_url.rfind('/')
@@ -597,8 +594,7 @@ def lxwxw_parse_book(book_url):
   return parse_result
   
 
-def lxwxw_parse_chapter(chapter_url):
-  main_url = 'http://www.lxwxw.com'
+def to92_parse_chapter(chapter_url):
   main_read_url = chapter_url[ 0 : chapter_url.rfind('/') + 1] # 后面带'/'
   
   fetch_result = urlfetch.fetch(chapter_url, allow_truncated=True)  
@@ -612,22 +608,9 @@ def lxwxw_parse_chapter(chapter_url):
   chapter_title_re = re.compile("chaptername\s*=\s*'([^']*)';")
   put_into_dict(parse_result, 'chapter_title', get_re_first(html, chapter_title_re))
   
-  #book_url = main_read_url[ main_read_url.find('/html')+5: -1] + '.html'
-  #put_into_dict(parse_result, 'book_url', main_url + '/xiaoshuoinfo' + book_url)
 
-  # prev_url_re = re.compile('preview_page\s*=\s*"([^"]*)";')
-  # prev_url = get_re_first(html, prev_url_re)
-  # if prev_url:
-    # if prev_url.find('index.html') == -1:
-      # put_into_dict(parse_result, 'prev_url', main_read_url + prev_url)
   
-  # next_url_re = re.compile('next_page\s*=\s*"([^"]*)";')
-  # next_url = get_re_first(html, next_url_re)
-  # if next_url:
-    # if next_url.find('index.html') == -1:
-      # put_into_dict(parse_result, 'next_url', main_read_url + next_url)
-  
-  content_xpath = '//*[@id="content"]'
+  content_xpath = "//div[@id='content']"
   chapter_content = get_xpath_unicode(document, content_xpath)
   if chapter_content:
     if chapter_content.find('class="imagecontent"') != -1: # 图片章节
@@ -635,21 +618,21 @@ def lxwxw_parse_chapter(chapter_url):
       img_list = document.findAll('img', 'imagecontent')
       for img in img_list:        
         img_url = img['src']
-        chapter_content = chapter_content + u'<img src="'+img_url+ '" /><br />'
+        chapter_content = chapter_content + '<div>'+ '<img src="'+img_url+ '" /></div>'
+      put_into_dict(parse_result, 'content_list', [chapter_content])
+      put_into_dict(parse_result, 'content_type', 'image')
+
     else: # 文字章节
       # 开始格式化文本
-      chapter_content = chapter_content.replace('&nbsp;&nbsp;&nbsp;&nbsp;',u'　　')
-      paragraph_list = chapter_content.split('<br /><br />')
-      paragraph_list[0] = paragraph_list[0].replace('<div id="content" name="content">','')
-      paragraph_list[0] = paragraph_list[0].lstrip(' \r\n').replace('\t','')
-      paragraph_list[-1] = paragraph_list[-1].replace('</div>','').rstrip()
-      chapter_content = ''.join( ['<p>'+x+'</p>' for x in paragraph_list if x] )
-        
-    put_into_dict(parse_result, 'content', chapter_content)  
+      paragraph_list = chapter_content.split('<br />')      
+      paragraph_list = [x.strip() for x in paragraph_list]
+      paragraph_list = [x.replace('&nbsp;&nbsp;&nbsp;&nbsp;',u'　　') for x in paragraph_list if x]
+      put_into_dict(parse_result, 'content_list', paragraph_list)
+      put_into_dict(parse_result, 'content_type', 'text')    
 
   return parse_result
 
-def lxwxw_parse_catalog(catalog_url):
+def to92_parse_catalog(catalog_url):
   # main_read_url = catalog_url[ 0 : catalog_url.rfind('/') + 1] # 后面带'/'
   
   fetch_result = urlfetch.fetch(catalog_url, allow_truncated=True)
@@ -659,8 +642,8 @@ def lxwxw_parse_catalog(catalog_url):
   
   parse_result = {}
   
-  title_xpath = '/html/body/div[4]/h1'
-  put_into_dict(parse_result, 'title', get_xpath_string(document, title_xpath))
+  #title_xpath = '/html/body/div[4]/h1'
+  #put_into_dict(parse_result, 'title', get_xpath_string(document, title_xpath))
 
   # 本网站有的目录没有分卷
   td_list = document.findAll('td')
@@ -1142,16 +1125,16 @@ def get_parse_handle(url):
       info_result['book_url'] = url[:url.rfind('/reader')] + '/book/' + book_id + '.html'
       
       
-  # 理想文学网
-  # http://www.lxwxw.com/xiaoshuoinfo/68/68966.html
-  # http://www.lxwxw.com/files/article/html/68/68966/index.html
-  # http://www.lxwxw.com/files/article/html/68/68966/12625439.html
-  elif url.find('lxwxw') != -1:
-    info_result['site'] = u'理想'
+  # 就爱读书
+  # http://www.92to.com/xiaoshuoinfo/67/67346.html
+  # http://www.92to.com/files/article/html/67/67346/index.html
+  # http://www.92to.com/files/article/html/67/67346/12202834.html
+  elif url.find('92to') != -1:
+    info_result['site'] = u'就爱'
     handle_result = {
-      'book': lxwxw_parse_book,
-      'chapter': lxwxw_parse_chapter,
-      'catalog': lxwxw_parse_catalog,
+      'book': to92_parse_book,
+      'chapter': to92_parse_chapter,
+      'catalog': to92_parse_catalog,
       }      
     if url.find('xiaoshuoinfo') != -1:
       info_result['url_type'] = 'book'
@@ -1288,7 +1271,7 @@ def get_data(url, url_info = None, url_handle = None):
 
   
 if __name__== "__main__":
-  #fetch_result = urllib2.urlopen('http://www.qidian.com/BookReader/1442549,26069303.aspx').read()
+  fetch_result = urllib2.urlopen('http://www.92to.com/files/article/html/67/67346/12202803.html').read()
 
   #html = fetch_result
   
@@ -1297,7 +1280,7 @@ if __name__== "__main__":
   #chapter_title_xpath = '/html/'
   #print get_xpath_string(document, chapter_title_xpath)
   
-  print get_parse_handle('http://www.lxwxw.com/files/article/html/68/68966/index.html')
+  print get_parse_handle('http://www.92to.com/files/article/html/67/67346/12202803.html')
   
 
 
