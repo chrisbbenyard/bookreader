@@ -1238,7 +1238,7 @@ def get_parse_handle(url):
   return (info_result, handle_result)  
     
 
-def get_data(url, url_info = None, url_handle = None):
+def get_data2(url, url_info = None, url_handle = None):
   if not (url_info and url_handle):
     (url_info, url_handle) = get_parse_handle(url)
   
@@ -1268,7 +1268,204 @@ def get_data(url, url_info = None, url_handle = None):
   
   return book_info  
   
+def get_parser(url):    
+  # 起点中文网
+  # http://www.qidian.com/Book/1442549.aspx
+  # http://www.qidian.com/BookReader/1442549.aspx
+  # http://www.qidian.com/BookReader/1442549,26069303.aspx
+  
+  result = {}
+  
+  if url.find('qidian') != -1:    
+    parser = {      
+      'coding': 'gbk',
+      ##
+      'string_identifier_book': '/book/',
+      'string_identifier_catalog': '',
+      'string_identifier_chapter': ',',     
+      ## cover
+      'title_xpath': "//div[@id='divBookInfo']/div[@class='title']/h1",
+      'author_xpath': "//div[@id='divBookInfo']/div[@class='title']/a",
+      'update_date_re': u'\s*(\d*)-(\d*)-(\d*)\s*(\d*):(\d*)',
+      'last_url_xpath': "//*[@id='readP']/div[@class='title']/h3/a",
+      'last_url_replace_re': '/BookReader/',
+      'last_url_replace_string': '',
+      'chapter_url_prefix_replace_re': '/BookReader/',
+      'chapter_url_prefix_replace_string': 'http://www.qidian.com/BookReader/',
+      'catalog_url_replace_re': '/Book/',
+      'catalog_url_replace_string': '/BookReader/',
+      
+      ## catalog
+      'book_url_replace_re': '/BookReader/',
+      'book_url_replace_string': '/Book/',
+      'vol_list_re': "//div[@class='box_title']",
+      'vol_name_re': "//div[@class='box_title']/div[@class='title']/b",
+      'chapter_list_re': "//li/a",
+      
+      ## chapter
+      'chapter_title_xpath': '//*[@id="lbChapterName"]',
+      'content_link_xpath': "//div[@id='content']/script",
+      'content_xpath': '',
+      
+    
+      
+    }
+  
+    ##
+    result['site'] = u'起点'
+    ##
+    
+    url = url.lower()
+    is_book = parser['string_identifier_book'].lower()
+    is_catalog = parser['string_identifier_catalog'].lower()
+    is_chapter = parser['string_identifier_chapter'].lower()
+    
+    url_type = None
+    if (is_book and url.find(is_book)!=-1) or (not is_book and url_type == None):
+      url_type = 'book'
+    if (is_catalog and url.find(is_catalog)!=-1) or (not is_catalog and url_type == None):
+      url_type = 'catalog'
+    if (is_chapter and url.find(is_chapter)!=-1) or (not is_chapter and url_type == None):
+      url_type = 'chapter'
+    result['url_type'] = url_type
+    
+  return (result, parser)
+  
+    
+def get_data(url):
 
+  (url_info, parser) = get_parser(url)
+  
+  if url_info == None:
+    return None
+  
+  
+  if url_info['url_type'] == 'chapter':    
+    result = parse_chapter(url, parser)
+    if not result.has_key('chapter_title'):
+      result['chapter_title'] = None    
+      
+  elif url_info['url_type'] == 'book':
+    result = parse_book(url, parser)
+    if not result.has_key('author'):
+      result['author'] = None
+    if not result.has_key('title'):
+      result['title'] = None
+   
+  elif url_info['url_type'] == 'catalog':  
+    result = parse_catalog(url, parser)   
+
+  else:
+    pass
+
+  url_info.update(result)  
+  return url_info
+  
+  
+def parse_book(book_url, parser):
+
+  fetch_result = urlfetch.fetch(book_url, allow_truncated=True)  
+  html = fetch_result.content.decode(parser['coding'], 'ignore')
+  document = BSXPathEvaluator(html)
+  
+  parse_result = {}  
+  
+  put_into_dict(parse_result, 'catalog_url', re.sub(parser['catalog_url_replace_re'], parser['catalog_url_replace_string'], book_url) )
+
+  # title
+  put_into_dict( parse_result, 'title', get_xpath_string(document, parser['title_xpath']) )
+  # author
+  put_into_dict( parse_result, 'author', get_xpath_string(document, parser['author_xpath']) )
+
+  # update_date  
+  update_date_re = re.compile(parser['update_date_re']) 
+  update_date = get_re_first(html, update_date_re)
+  if update_date and len(update_date)>=3:
+    update_date = [int(x) for x in update_date]
+    put_into_dict( parse_result, 'update_date', datetime.datetime( *update_date ) + datetime.timedelta( hours=-8 ) )  
+  else:
+    (year, month, day) = (1900, 1, 1)
+  
+    
+  
+  last_url = get_xpath_attr(document, parser['last_url_xpath'], 'href')
+  if last_url:      
+    put_into_dict(parse_result, 'last_url', re.sub(parser['last_url_replace_re'], parser['last_url_replace_string'], last_url ) ) 
+    put_into_dict(parse_result, 'chapter_url_prefix', re.sub(parser['chapter_url_prefix_replace_re'], parser['chapter_url_prefix_replace_string'], last_url ))
+  
+  return parse_result
+  
+  
+def parse_catalog(catalog_url, parser):
+  
+  fetch_result = urlfetch.fetch(catalog_url, allow_truncated=True)  
+  html = fetch_result.content.decode(parser['coding'], 'ignore')
+  document = BSXPathEvaluator(html)
+  
+  parse_result = {}
+  
+  put_into_dict(parse_result, 'book_url', re.sub(parser['book_url_replace_re'], parser['book_url_replace_string'], catalog_url) )
+  
+  
+  vol_name = document.getItemList(parser['vol_name_re'])
+  vol_list = document.getItemList(parser['vol_list_re'])
+
+  chapter_url_list = []
+  chapter_title_list = []
+  for i in range(len(vol_list)):    
+    title = vol_name[i].string
+    chapter_url_list.append('') # 数据库的列表不能保存None
+    chapter_title_list.append( title )
+    
+    # if unicode(vol_list[i]).find(u'订阅VIP章节') != -1:
+      # chapter_title_list[-1] = u'VIP章节'
+      # break
+
+    chapter_list =  vol_list[i].getItemList(parser['chapter_list_re'])
+    for j in chapter_list:
+      if j.a != None: # 存在空标签，跳过
+        url = j.a['href']
+        title = unicode(j.a.string)
+        chapter_url_list.append( url ) 
+        chapter_title_list.append( title )
+        
+  put_into_dict(parse_result, 'chapter_url_list', chapter_url_list)
+  put_into_dict(parse_result, 'chapter_title_list', chapter_title_list)
+  
+  
+  return parse_result
+  
+def parse_chapter(chapter_url, parser):
+  fetch_result = urlfetch.fetch(chapter_url, allow_truncated=True)  
+  html = fetch_result.content.decode(parser['coding'], 'ignore')
+  document = BSXPathEvaluator(html)
+  
+  parse_result = {} 
+
+  put_into_dict(parse_result, 'chapter_title', get_xpath_string(document, parser['chapter_title_xpath']))
+
+
+  content_link = get_xpath_attr(document, parser['content_link_xpath'], 'src')  
+  if content_link:
+    chapter_content = urlfetch.fetch(content_link, allow_truncated=True).content.decode(parser['coding'], 'ignore')  
+    end_pos = chapter_content.rfind("');")
+    chapter_content = chapter_content[ 16:end_pos ]  # 去掉 document.write
+    for repeat in range(2): # 竟然可能出现两遍，http://www.qidian.com/BookReader/1440558,26722994.aspx
+      end_pos = chapter_content.rfind("<a href=http://www.qidian.com>")
+      if end_pos != -1:
+        chapter_content = chapter_content[0:end_pos] # 去掉页末的链接
+    end_pos = chapter_content.rfind("<a href=http://www.cmfu.com>")
+    if end_pos != -1:
+      chapter_content = chapter_content[0:end_pos] # 去掉页末的链接  
+      
+    # 开始格式化文本
+    chapter_content = chapter_content.rstrip(u'　') # 去掉末尾的全角空格
+    paragraph_list = chapter_content.split('<p>')
+    paragraph_list = [x for x in paragraph_list if x.strip()]
+    put_into_dict(parse_result, 'content_list', paragraph_list)
+    put_into_dict(parse_result, 'content_type', 'text')
+    
+  return parse_result
   
 if __name__== "__main__":
   fetch_result = urllib2.urlopen('http://www.92to.com/files/article/html/67/67346/12202803.html').read()
