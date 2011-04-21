@@ -17,7 +17,7 @@ def get_xpath_string(document, xpath):
 
 def get_xpath_contents(document, xpath):
   try:
-    return u''.join( [unicode(x) for x in document.getFirstItem(xpath).contents] )
+    return u''.join( [unicode(x) for x in document.getFirstItem(xpath).contents] ).strip('\r\n ')
   except:
     return None    
     
@@ -35,19 +35,20 @@ def get_xpath_attr(document, xpath, attr):
     
 def get_re_first(html, r):
   if html:    
-    result = r.findall(html)
+    result = re.findall(r, html)
     if len(result) > 0:
-      return result[0]
-  
+      return result[0]  
   return None
 
-def get_re_last(html, r):
-  if html:    
-    result = r.findall(html)
-    if len(result) > 0:
-      return result[-1]
-  
-  return None
+def get_item(document, html, xpath_string, re_exp):
+ if xpath_string and re_exp:
+   return get_re_first( get_xpath_contents(document, xpath_string), re_exp)
+ elif xpath_string:
+   return get_xpath_contents(document, xpath_string)
+ else:
+   return get_re_first(html, re_exp)
+    
+ 
 
 # None 和空串不放入字典
 # 注意到，如果value是空一类的值，则不要添加到字典
@@ -73,6 +74,7 @@ def get_parser(url):
   parser.identifier_cover = '/Book/'
   parser.identifier_catalog = ''
   parser.identifier_chapter = ','
+  
   parser.title_xpath = "//div[@id='divBookInfo']/div[@class='title']/h1"
   parser.author_xpath = "//div[@id='divBookInfo']/div[@class='title']/a"
   parser.update_date_re = u'\s*(\d*)-(\d*)-(\d*)\s*(\d*):(\d*)'
@@ -89,14 +91,60 @@ def get_parser(url):
   parser.chapter2cover_re = r'/BookReader/(\d*),\d*'
   parser.chapter2cover_string = r'/Book/\1'
   
-  parser.vol_name_re = "//div[@id='content']/div[@class='box_title']/div[@class='title']/b"
-  parser.vol_list_re = "//div[@id='content']//div[@class='list']"
+  parser.vol_and_chapter_list_re = "//div[@id='content']//b | //div[@id='content']//div[@class='list']//a"  
   parser.vol_vip_string = u"VIP卷"
+  
   parser.chapter_title_xpath ='//*[@id="lbChapterName"]'
-  parser.content_link_xpath =  "//div[@id='content']/script"
+  parser.content_link_xpath = "//div[@id='content']/script"
   parser.content_xpath = ''
+  
+  parser.content_format_re = u"document\.write\(\'(.*?)((<a href=http://www.qidian.com>)+.*|\'\);)"
+  parser.content_format_string = "\\1"
+  parser.content_split_string = '<p>'
   parser.put()
   ##
+  
+  ###########  
+  parser = Parser.get_or_insert('http://www.niepo.net')    
+  parser.site_coding = 'gbk'
+  parser.site_name = u'涅破小说网'
+  parser.site_short_name = u'涅破'
+  parser.site_description = ''
+  parser.identifier_cover = 'book'
+  parser.identifier_catalog = 'index'
+  parser.identifier_chapter = ''
+  
+  parser.title_xpath = '//h1'
+  parser.author_re = u'者：\s*([^<]*)</td>'
+  parser.update_date_re = u'最后更新：(\d*)-(\d*)-(\d*)'
+  parser.last_url_xpath = "//div[@id='content']/table/tbody/tr[4]/td/table/tbody/tr/td[2]/a[2]"  
+  parser.last_url_replace_re = r'.*/'
+  parser.last_url_replace_string = ''
+  parser.chapter_url_prefix_replace_re = '.*'
+  parser.chapter_url_prefix_replace_string = 'http://www.niepo.net/reader/'
+  
+  parser.cover2catalog_re = '/book/'
+  parser.cover2catalog_string = '/index/'
+  parser.catalog2cover_re = '/index/'
+  parser.catalog2cover_string = '/book/'
+  parser.chapter2cover_re = r'/reader/(\d*)-\d*'
+  parser.chapter2cover_string = r'/book/\1'
+  
+  parser.vol_and_chapter_list_re = "//td[@class='vcss'] | //td[@class='ccss']/a"  
+  parser.vol_vip_string = '' 
+  parser.url_remove_prefix_re = '/reader/'
+  parser.url_remove_prefix_string = ''
+  
+  
+  parser.chapter_title_xpath = "//div[@id='title']"
+  parser.content_link_xpath = ''
+  parser.content_xpath = "//div[@id='content']"
+  
+  parser.content_format_re = ''
+  parser.content_format_string = ''
+  parser.content_split_string = '<br />'
+  parser.put()
+  ##  
   
   ## 使用url前部分作为辨识
   key_name_list = [key.name() for key in Parser.all(keys_only=True)]
@@ -183,13 +231,14 @@ def parse_cover(cover_url, parser):
 
 
   # title
-  put_into_dict( parse_result, 'title', get_xpath_string(document, parser.title_xpath) )
+  title = get_item(document, html, parser.title_xpath, parser.title_re)
+  put_into_dict( parse_result, 'title', title.strip() )
   # author
-  put_into_dict( parse_result, 'author', get_xpath_string(document, parser.author_xpath) )
+  author = get_item(document, html, parser.author_xpath, parser.author_re)
+  put_into_dict( parse_result, 'author', author.strip() )
 
   # update_date  
-  update_date_re = re.compile(parser.update_date_re) 
-  update_date = get_re_first(html, update_date_re)
+  update_date = get_re_first(html, parser.update_date_re)
   if update_date and len(update_date)>=3:
     update_date = [int(x) for x in update_date]
     put_into_dict( parse_result, 'update_date', datetime.datetime( *update_date ) + datetime.timedelta( hours=-8 ) )  
@@ -213,28 +262,26 @@ def parse_catalog(catalog_url, parser):
   
   parse_result = {} 
   
-  vol_name = document.getItemList(parser.vol_name_re)
-  vol_list = document.getItemList(parser.vol_list_re)
+  vol_list = document.getItemList(parser.vol_and_chapter_list_re)
  
   chapter_url_list = []
   chapter_title_list = []
-  for i in range(len(vol_list)):  
-    # 判断是否解析到了VIP卷
-    if unicode(vol_name[i]).find(parser.vol_vip_string) == -1:      
-      chapter_url_list.append('') # 数据库的列表不能保存None    
-      chapter_title_list.append( vol_name[i].contents[0] )    # contents[0]兼容性更强一些
-    else:
-      chapter_url_list.append('') # 数据库的列表不能保存None    
-      chapter_title_list.append( parser.vol_vip_string )   
-      break     
-
-    chapter_list =  vol_list[i].findAll('a')
-    for j in chapter_list:
-      if j != None: # 存在空标签，跳过
-        url = j['href']
-        title = unicode(j.string)
-        chapter_url_list.append( url ) 
-        chapter_title_list.append( title )
+  for i in vol_list:  
+    if i.name != 'a':  
+      # 判断是否解析到了VIP卷
+      if not parser.vol_vip_string or unicode(i).find(parser.vol_vip_string) == -1:      
+        chapter_url_list.append('') # 数据库的列表不能保存None    
+        chapter_title_list.append( i.contents[0] )    # contents[0]兼容性更强一些
+      else:
+        chapter_url_list.append('') # 数据库的列表不能保存None    
+        chapter_title_list.append( parser.vol_vip_string )   
+        break     
+    else:            
+      url = i['href']
+      if parser.url_remove_prefix_re:
+        url = re.sub(parser.url_remove_prefix_re, parser.url_remove_prefix_string, url)
+      chapter_url_list.append( url ) 
+      chapter_title_list.append( unicode(i.string) )
         
   put_into_dict(parse_result, 'chapter_url_list', chapter_url_list)
   put_into_dict(parse_result, 'chapter_title_list', chapter_title_list)
@@ -252,26 +299,19 @@ def parse_chapter(chapter_url, parser):
 
   put_into_dict(parse_result, 'chapter_title', get_xpath_string(document, parser.chapter_title_xpath))
 
-
-  content_link = get_xpath_attr(document, parser.content_link_xpath, 'src')  
-  if content_link:
-    chapter_content = urlfetch.fetch(content_link, allow_truncated=True).content.decode(parser.site_coding, 'ignore')  
-    end_pos = chapter_content.rfind("');")
-    chapter_content = chapter_content[ 16:end_pos ]  # 去掉 document.write
-    for repeat in range(2): # 竟然可能出现两遍，http://www.qidian.com/BookReader/1440558,26722994.aspx
-      end_pos = chapter_content.rfind("<a href=http://www.qidian.com>")
-      if end_pos != -1:
-        chapter_content = chapter_content[0:end_pos] # 去掉页末的链接
-    end_pos = chapter_content.rfind("<a href=http://www.cmfu.com>")
-    if end_pos != -1:
-      chapter_content = chapter_content[0:end_pos] # 去掉页末的链接  
+  if parser.content_link_xpath:  
+    content_link = get_xpath_attr(document, parser.content_link_xpath, 'src')    
+    chapter_content = urlfetch.fetch(content_link, allow_truncated=True).content.decode(parser.site_coding, 'ignore')
+  else:
+    chapter_content = get_xpath_contents(document, parser.content_xpath)
       
-    # 开始格式化文本
-    chapter_content = chapter_content.rstrip(u'　') # 去掉末尾的全角空格
-    paragraph_list = chapter_content.split('<p>')
-    paragraph_list = [x for x in paragraph_list if x.strip()]
-    put_into_dict(parse_result, 'content_list', paragraph_list)
-    put_into_dict(parse_result, 'content_type', 'text')
+  # 开始格式化文本
+  if parser.content_format_re:
+    chapter_content = re.sub(parser.content_format_re, parser.content_format_string, chapter_content) 
+  paragraph_list = chapter_content.split(parser.content_split_string)
+  paragraph_list = [x for x in paragraph_list if x.strip()]
+  put_into_dict(parse_result, 'content_list', paragraph_list)
+  put_into_dict(parse_result, 'content_type', 'text')
     
   return parse_result
   
