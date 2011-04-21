@@ -530,22 +530,21 @@ def task_add_book(user_info, url):
 
   user = user_info['user']
   
-  (url_info, url_handle) = BookParser.get_parse_handle(url)
+  (book_info, parser) = BookParser.get_parser(url)
 
-  if url_info == None:
+  if book_info == None:
     return 'Error: URL is not supported!'
   
-  book_info = url_info
-
   # 首先加入书页信息，获取必备的数据
-  book_info.update( url_handle['book'](url_info['book_url']) )
+  if book_info['cover_url']:
+    book_info.update( BookParser.get_data(book_info['cover_url']) )
   
   # 必须有作者，标题，目录页，章节地址前缀
   # 如果没有这些就没法构造 Book 和 Catalog
-  if not ( url_info.has_key('author') and 
-           url_info.has_key('title') and 
-           url_info.has_key('catalog_url') and 
-           url_info.has_key('chapter_url_prefix') ):      
+  if not ( book_info.has_key('author') and 
+           book_info.has_key('title') and 
+           book_info.has_key('catalog_url') and 
+           book_info.has_key('chapter_url_prefix') ):      
     return 'Error: The necessary information is not complete!'   + '\r\n' + str(book_info)
   author = book_info['author']
   title = book_info['title']
@@ -563,7 +562,7 @@ def task_add_book(user_info, url):
   # 判断是否需要重新获取目录
   if not book_info['last_url'] in catalog.chapter_url_list:    # 包括了catalog 是新生成的，即使last_url是None
     # 获取目录
-    book_info.update( url_handle['catalog'](catalog_url) )
+    book_info.update( BookParser.get_data(catalog_url) )
     catalog.put_info(book_info)     
     last_check.put()
     
@@ -624,7 +623,7 @@ def task_update_catalog(catalog):
   new_catalog_info = BookParser.get_data(catalog_url)
   if (new_catalog_info['chapter_url_list'] != catalog.chapter_url_list) and (len(new_catalog_info['chapter_url_list'])>0):
     # 更新最后更新时间
-    new_catalog_info.update( BookParser.get_data(catalog.book_url) )
+    new_catalog_info.update( BookParser.get_data(catalog.cover_url) )
     catalog.put_info(new_catalog_info)
     catalog.update_bookmarks()
     return True
@@ -669,7 +668,7 @@ class Schedule(webapp.RequestHandler):
 
 
 
-# 实现Atom推送，以book_url为参数   
+# 实现Atom推送，以cover_url为参数   
 # 注意，网址都是小写！因为我在 BookParser 中都小写处理了   
 class Atom(webapp.RequestHandler):
   # def head(self, catalog_url):
