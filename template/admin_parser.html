@@ -1,0 +1,36 @@
+﻿<html>
+  
+  <head>
+    <title>ReadTxT - 解析管理</title>
+    <meta name="viewport" content="width=device-width" />   
+    <link rel="shortcut icon" href="/favicon.ico" />
+  </head>  
+  <body>
+  
+    <p>
+      欢迎管理员 {{ nickname }}
+      <a href="{{ logout_url }}">注销</a>
+      <br/>
+      <a href="/admin/users">用户管理</a>
+      <a href='/admin/books'>书籍管理</a>   
+      <a href='/admin/parser'>解析管理</a>
+    </p>
+    <p>
+      格式：每行一个地址，会自动忽略非 URL 的行。      
+    </p>
+    
+    <p>
+      <a href="/admin/parser/export">导出解析数据</a>
+    </p>
+    
+    <form action="/admin/parser/import" method="post">
+      <div><textarea name="import_content" rows="8" cols="60"></textarea></div>
+      <div><input type="submit" value="批量导入"></div>
+    </form>
+    
+    <p>
+      因为批量加入新书是在后台执行，因此在列表中显示有一定的延迟。    
+    </p>
+
+  </body>
+</html>
