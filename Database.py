@@ -246,10 +246,10 @@ class Chapter(db.Model):
       }    
 
   def export_html(self):
-    return ''.join( ['<p>'+x+'</p>' for x in self.content_list] )
+    return ''.join( [u'<p>　　'+x+'</p>' for x in self.content_list] )
     
   def export_txt(self):
-    return self.chapter_title + '\r\n' + ''.join( ['\r\n'+x+'\r\n' for x in self.content_list] ) + '\r\n\r\n'
+    return self.chapter_title + '\r\n' + ''.join( [u'\r\n　　'+x+'\r\n' for x in self.content_list] ) + '\r\n\r\n'
     
 
 # 用户书签
