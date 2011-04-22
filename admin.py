@@ -3,6 +3,7 @@
 import os
 import urllib 
 import re
+import xml.etree.ElementTree as etree
 
 # 使用新的版本的django
 # from google.appengine.dist import use_library
@@ -14,7 +15,10 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api.labs import taskqueue
 from google.appengine.api import memcache
+
 import Database
+from Parser import Parser
+
 
 def get_broken_bookmarks():
   all_bookmarks_query = Database.Bookmark.all() 
@@ -58,6 +62,21 @@ def get_all_lastcheck_keys():
 
 def get_all_chapter_keys():
   return [key for key in Database.Chapter.all(keys_only=True)]   
+  
+def export_parser():
+  return '<parser>\n' + ''.join([x.to_xml().encode('utf-8') for x in Parser.Parser.all() ]) + '</parser>'
+  
+def import_parser(xml_string):
+  tree = etree.fromstring(xml_string.encode('utf-8'))
+  tree = etree.ElementTree(tree)
+  entity_list = tree.findall('entity')
+  for entity in entity_list:
+    # # # # # l = tree.findall('property')
+    # # # # # r = tree.getroot()  
+    # # # # # print l[9].attrib 
+    # # # # # exec 'k.title_xpath="1"'
+
+    
   
 class AdminPage(webapp.RequestHandler):
   def get(self):
@@ -235,6 +254,44 @@ class DeleteCatalog(webapp.RequestHandler):
       self.response.out.write('The catalog does not exists!')
     
     self.redirect('/admin/books')
+    
+class ManageParser(webapp.RequestHandler):
+  def get(self):
+
+    template_values = {
+      
+      }
+
+    path = os.path.join(os.path.dirname(__file__), 'template/admin_parser.html')
+    self.response.out.write(template.render(path, template_values))   
+
+
+class ExportParser(webapp.RequestHandler):
+  def get(self):
+    xml_content = export_parser()
+         
+    if not xml_content:
+      self.response.out.write('Empty!')
+      return
+    
+    # 设置header
+    self.response.headers['Content-Type'] = 'application/octet-stream;charset=utf-8' 
+    self.response.headers['Content-Disposition'] = 'attachment;filename="parser.xml"'
+
+    self.response.out.write(xml_content)    
+
+
+    
+class ImportParser(webapp.RequestHandler):
+ 
+
+  def post(self):    
+    self.response.out.write("hello")   
+
+    
+
+        
+
 
     
 application = webapp.WSGIApplication(
@@ -253,6 +310,10 @@ application = webapp.WSGIApplication(
                                       ('/admin/books', BookManage),
                                       ('/admin/book/delete/(.*)', DeleteBook),
                                       ('/admin/catalog/delete/(.*)', DeleteCatalog),
+                                      
+                                      ('/admin/parser', ManageParser),
+                                      ('/admin/parser/export', ExportParser),
+                                      ('/admin/parser/import', ImportParser),
                                      ],
                                      debug=True)
 
