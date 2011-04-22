@@ -299,7 +299,7 @@ def parse_chapter(chapter_url, parser):
 
   put_into_dict(parse_result, 'chapter_title', get_xpath_string(document, parser.chapter_title_xpath))
 
-  if parser.content_link_xpath:  
+  if parser.content_link_xpath:  # 就是起点...
     content_link = get_xpath_attr(document, parser.content_link_xpath, 'src')    
     chapter_content = urlfetch.fetch(content_link, allow_truncated=True).content.decode(parser.site_coding, 'ignore')
   else:
@@ -309,7 +309,7 @@ def parse_chapter(chapter_url, parser):
   if parser.content_format_re:
     chapter_content = re.sub(parser.content_format_re, parser.content_format_string, chapter_content) 
   paragraph_list = chapter_content.split(parser.content_split_string)
-  paragraph_list = [x for x in paragraph_list if x.strip()]
+  paragraph_list = [x.strip() for x in paragraph_list if x.strip()]  
   put_into_dict(parse_result, 'content_list', paragraph_list)
   put_into_dict(parse_result, 'content_type', 'text')
     
