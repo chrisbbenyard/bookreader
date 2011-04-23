@@ -1,0 +1,56 @@
+﻿<html>
+  <head>
+    <title>ReadTxT - 书籍管理</title>
+    <meta name="viewport" content="width=device-width" />   
+    <link rel="shortcut icon" href="/favicon.ico" />
+   </head>  
+  
+  
+  <body>
+  
+    <p>
+      <a href="/">首页</a>
+      <a href="/export">导出书签</a>
+      <a href="/import">批量加入</a>
+      <a href="/help.html">帮助</a>
+    </p>
+ 
+    {% for book in booklist %}      
+      <b>{{ book.title }}</b> - {{ book.author }} 
+      <a href="{{ book.delete_link }}">删除本书</a>
+
+      <table>
+      {% for catalog in book.catalogs %}     
+      <tr>
+        <td>
+          {{ catalog.site }}
+          <a href="/addbook/{{ catalog.catalog_url }}">添加书签</a>
+          <a href="http://allfeed.latest.feedservers.appspot.com/readtxt/{{ catalog.catalog_url }}.xml">订阅更新</a>
+          (共{{ catalog.chapter_number }}章)
+        </td>
+      </tr>
+      <tr>                
+        <td>+最后章节: <a href="/addbook/{{ catalog.last_chapter_url }}">{{ catalog.last_chapter_title }}</a></td>
+      </tr>
+      <tr>        
+        <td>+最后更新: {{ catalog.update_date.date}} ({{ catalog.last_check_date}}前刷新)</td>
+      </tr>
+     
+      {% endfor %}
+      <tr style="height:1em;"></tr>
+      </table>
+    {% endfor %}
+    
+    <p>
+      <a href="/help.html#subscribe">有关订阅的重要说明</a><br />
+      <a href="/help.html#support">目前支持的网站</a>
+    </p>
+    <p>-----</p>
+    <form action="/addbook/" method="post">   
+      地址：<br/>
+      <input type="text" id="chapter_url" name="chapter_url" style="width:250">
+      <input type="submit" value="加入新书"><br/>
+      </table>    
+    </form>
+  </body>
+</html>

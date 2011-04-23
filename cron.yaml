@@ -1,0 +1,4 @@
+cron:
+- description: auto update catalogs
+  url: /cron/update
+  schedule: every 4 hours

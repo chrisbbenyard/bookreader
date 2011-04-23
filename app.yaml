@@ -1,0 +1,91 @@
+application: readtxt
+version: release
+runtime: python
+api_version: 1
+
+handlers:
+
+# main interface
+- url: /
+  script: readtxt.py
+  
+- url: /login
+  script: readtxt.py
+
+- url: /logout
+  script: readtxt.py  
+
+- url: /user
+  script: readtxt.py
+  
+  
+# function  
+- url: /addbook/.*
+  script: readtxt.py
+  
+- url: /quickupdate
+  script: readtxt.py
+  
+- url: /export
+  script: readtxt.py
+  
+- url: /import
+  script: readtxt.py
+  
+  
+
+# bookmarks  
+- url: /bookmarks
+  script: readtxt.py
+  
+- url: /bookmark/.*
+  script: readtxt.py  
+  
+  
+
+# books 
+- url: /books
+  script: readtxt.py
+  
+- url: /book/.*
+  script: readtxt.py
+  
+# help
+- url: /help.html
+  script: readtxt.py
+
+
+# background task  
+- url: /atom/.*
+  script: readtxt.py
+
+- url: /task/.*
+  script: readtxt.py
+  login: admin
+
+- url: /cron/.*
+  script: readtxt.py
+  login: admin
+  
+  
+# admin 
+- url: /admin
+  script: admin.py
+  login: admin
+  
+- url: /admin/.*
+  script: admin.py
+  login: admin
+  
+
+  
+  
+# other static pages
+
+- url: /image
+  static_dir: image
+  
+
+- url: /
+  static_dir: static
+  

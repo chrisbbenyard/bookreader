@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title type="text"><![CDATA[{{ book.title }} - {{ book.author }}]]></title>
+  <subtitle type="html">
+   <![CDATA[{{ book.title }} - {{ book.author }}]]>
+  </subtitle>
+  <updated>{{ last_update_date }}</updated>
+  <id>{{ catalog.catalog_url }}</id>
+  <link rel="alternate" type="text/html" href="{{ catalog.book_url }}"/>
+
+  {% for chapter in chapter_list %}
+  <entry>
+    <title><![CDATA[{{ chapter.chapter_title }}]]></title>
+    <link rel="alternate" type="text/html" href="{{ chapter.curr_url }}"/>    
+    <id>{{ chapter.curr_url }}</id>
+    <updated>{{ last_update_date }}</updated>
+    <published>{{ last_update_date }}</published>
+    <author>
+      <name><![CDATA[{{ book.author }}]]></name>
+    </author>
+    <content type="xhtml">
+      {{ chapter.content }}
+    </content>
+  </entry>
+  {% endfor %}
+
+  </feed>

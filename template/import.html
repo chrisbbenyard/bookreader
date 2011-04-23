@@ -1,0 +1,30 @@
+﻿<html>
+  
+  <head>
+    <title>ReadTxT - 批量导入</title>
+    <meta name="viewport" content="width=device-width" />   
+    <link rel="shortcut icon" href="/favicon.ico" />
+  </head>  
+  <body>
+  
+    <p>
+      <a href="/">首页</a>
+      <a href="/bookmarks">书签管理</a>
+      <a href="/help.html">帮助</a>
+    </p>
+    
+    <p>
+      格式：每行一个地址，会自动忽略非 URL 的行。      
+    </p>
+    
+    <form action="/import" method="post">
+      <div><textarea name="import_content" rows="8" cols="60"></textarea></div>
+      <div><input type="submit" value="批量导入"></div>
+    </form>
+    
+    <p>
+      因为批量加入新书是在后台执行，因此在列表中显示有一定的延迟。    
+    </p>
+
+  </body>
+</html>

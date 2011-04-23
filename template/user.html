@@ -1,0 +1,33 @@
+﻿<html>
+  <head>
+    <title>ReadTxT - 用户信息</title>
+    <meta name="viewport" content="width=device-width" />   
+    <link rel="shortcut icon" href="/favicon.ico" />
+   </head>  
+   
+  <body>  
+  <p>
+    <a href="/">首页</a>    
+    <a href="/bookmarks">书签管理</a>
+    <a href="{{ logout_url }}">更换用户</a>
+    <a href="/help.html">帮助</a>
+  </p>
+
+  <table>      
+    <tr>
+      <td colspan="2"><b>{{ nickname }}</b>
+    </tr>    
+    <tr>
+      <td>状态:</td>
+      <td>{{ book_number }} 本书, {{ bookmark_number }} 个书签</td>
+    </tr>      
+	</table>
+  
+  <p>-----</p>
+  <form method="post" action="/user">
+    昵称：<br/>
+    <input type="text" id="nickname" name="nickname" value="{{ nickname }}"style="width:150"><br />
+    <input type="submit" value="更改">
+  </form>
+  </body>
+</html>
