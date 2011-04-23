@@ -15,17 +15,15 @@
       <a href='/admin/books'>书籍管理</a>   
       <a href='/admin/parser'>解析管理</a>
     </p>
-    <p>
-      格式：每行一个地址，会自动忽略非 URL 的行。      
-    </p>
+
     
     <p>
       <a href="/admin/parser/export">导出解析数据</a>
     </p>
-    
-    <form action="/admin/parser/import" method="post">
-      <div><textarea name="import_content" rows="8" cols="60"></textarea></div>
-      <div><input type="submit" value="批量导入"></div>
+
+    <form action="/admin/parser/import" method="post" enctype="multipart/form-data">
+      <input type="file" name="xmlfile">
+      <input type="submit" value="上传">
     </form>
     
     <p>
