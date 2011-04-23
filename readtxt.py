@@ -16,6 +16,7 @@ from google.appengine.api.labs import taskqueue
 
 import BookParser
 import Database
+import Parser
 
 
   
@@ -429,10 +430,17 @@ class QuickUpdate(webapp.RequestHandler):
         
     self.redirect('/')
 
-    
-    
-    
-    
+class Help(webapp.RequestHandler):
+  def get(self):    
+    parser_info = Parser.get_parser_info()
+
+    template_values = {
+      'parser_info': parser_info,      
+      }
+
+    path = os.path.join(os.path.dirname(__file__), 'template/help.html')
+    self.response.out.write(template.render(path, template_values))   
+
    
    
    
@@ -742,6 +750,8 @@ application = webapp.WSGIApplication(
                                       (r'/task/(.*)', TaskQueue),
                                       (r'/cron/(.*)', Schedule),
                                       (r'/atom/(.*).xml', Atom), # 因为Google Reader不接受Feed以html结尾
+                                      
+                                      ('/help.html', Help),
                                       ],
                                      debug=True)
 

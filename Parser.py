@@ -9,6 +9,7 @@
 
 
 from google.appengine.ext import db
+import xml.etree.ElementTree as etree
 
 
 # 解析网站所需的信息
@@ -62,5 +63,42 @@ class Parser(db.Model):
   content_format_re = db.TextProperty()     # 格式化文本
   content_format_string = db.TextProperty() # ..
   content_split_string = db.TextProperty()  # 文本分段
+  content_remove_re = db.TextProperty()     # 移除
   
+
+def export_parser():
+  return '<parser>\n' + ''.join([x.to_xml().encode('utf-8') for x in Parser.all() ]) + '</parser>'
+  
+def import_parser(xml_string):
+  tree = etree.fromstring(xml_string)
+  tree = etree.ElementTree(tree)  
+  for entity  in tree.findall('entity'):    
+    key = entity.attrib.get('key')
+    if key:
+      key_name = db.Key(encoded=key).name()
+    else:
+      key_name = entity.attrib.get('key_name')
+    # 如果没有办法获取key_name
+    if not key_name:
+      continue
+    parser = Parser.get_or_insert(key_name)
+    for property in entity.findall('property'):
+      property_name = '_' + property.attrib['name']
+      property_type = property.attrib['type']
+      if property_type != 'null':      
+        property_value = property.text
+        if property_type == 'text' and property_value == None:
+          property_value = ''
+        vars(parser)[property_name] = property_value
+    
+    parser.put()
+    
+def get_parser_info():  
+  parser_info = []
+  for parser in Parser.all():
+    parser_info.append({
+      'site_name': parser.site_name,
+      'site_url': parser.key().name(),        
+      })
+  return parser_info
     
