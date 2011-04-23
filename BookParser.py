@@ -17,10 +17,11 @@ def get_xpath_string(document, xpath):
 
 def get_xpath_contents(document, xpath):
   try:
-    return u''.join( [unicode(x) for x in document.getFirstItem(xpath).contents] ).strip('\r\n ')
+    return ''.join( [unicode(x) for x in document.getFirstItem(xpath).contents] ).strip('\r\n ')
   except:
     return None    
-    
+
+## 废弃    
 def get_xpath_unicode(document, xpath):
   try:
     return unicode(document.getFirstItem(xpath)).strip('\r\n ')
@@ -40,6 +41,7 @@ def get_re_first(html, r):
       return result[0]  
   return None
 
+# 获取的结构可能比较复杂，所以结果可能需要strip()
 def get_item(document, html, xpath_string, re_exp):
  if xpath_string and re_exp:
    return get_re_first( get_xpath_contents(document, xpath_string), re_exp)
@@ -144,7 +146,7 @@ def parse_cover(cover_url, parser):
 
   fetch_result = urlfetch.fetch(cover_url, allow_truncated=True)  
   html = fetch_result.content.decode(parser.site_coding, 'ignore')
-  document = BSXPathEvaluator(html)
+  document = BSXPathEvaluator(html, convertEntities=BeautifulSoup.HTML_ENTITIES) # 转换实体字符
   
   parse_result = {}   
 
@@ -161,10 +163,8 @@ def parse_cover(cover_url, parser):
   if update_date and len(update_date)>=3:
     update_date = [int(x) for x in update_date]
     put_into_dict( parse_result, 'update_date', datetime.datetime( *update_date ) + datetime.timedelta( hours=-8 ) )  
-  else:
-    (year, month, day) = (1900, 1, 1)
-     
-  
+
+    
   last_url = get_xpath_attr(document, parser.last_url_xpath, 'href')
   if last_url:      
     put_into_dict(parse_result, 'last_url', re.sub(parser.last_url_replace_re, parser.last_url_replace_string, last_url ) ) 
@@ -177,7 +177,7 @@ def parse_catalog(catalog_url, parser):
   
   fetch_result = urlfetch.fetch(catalog_url, allow_truncated=True)  
   html = fetch_result.content.decode(parser.site_coding, 'ignore')
-  document = BSXPathEvaluator(html)
+  document = BSXPathEvaluator(html, convertEntities=BeautifulSoup.HTML_ENTITIES) # 转换实体字符
   
   parse_result = {} 
   
