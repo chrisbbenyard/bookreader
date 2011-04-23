@@ -64,17 +64,25 @@ def get_all_chapter_keys():
   return [key for key in Database.Chapter.all(keys_only=True)]   
   
 def export_parser():
-  return '<parser>\n' + ''.join([x.to_xml().encode('utf-8') for x in Parser.Parser.all() ]) + '</parser>'
+  return '<parser>\n' + ''.join([x.to_xml().encode('utf-8') for x in Parser.all() ]) + '</parser>'
   
 def import_parser(xml_string):
-  tree = etree.fromstring(xml_string.encode('utf-8'))
-  tree = etree.ElementTree(tree)
-  entity_list = tree.findall('entity')
-  for entity in entity_list:
-    # # # # # l = tree.findall('property')
-    # # # # # r = tree.getroot()  
-    # # # # # print l[9].attrib 
-    # # # # # exec 'k.title_xpath="1"'
+  tree = etree.fromstring(xml_string)
+  tree = etree.ElementTree(tree)  
+  for entity  in tree.findall('entity'):
+    key = entity.attrib['key']
+    key_name = Database.db.Key(encoded=key).name()
+    parser = Parser.get_or_insert(key_name)
+    for property in entity.findall('property'):
+      property_name = '_' + property.attrib['name']
+      property_type = property.attrib['type']
+      if property_type != 'null':
+        property_value = property.text
+        vars(parser)[property_name] = property_value
+    
+    parser.put()
+    
+
 
     
   
@@ -286,7 +294,14 @@ class ImportParser(webapp.RequestHandler):
  
 
   def post(self):    
-    self.response.out.write("hello")   
+    
+    xml_file = self.request.get('xmlfile')
+    # print self.request
+    # print xml_file
+    # print type(xml_file)
+    import_parser(xml_file)
+    
+    self.redirect('/admin/parser')
 
     
 
