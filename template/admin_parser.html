@@ -1,0 +1,47 @@
+﻿<html>
+  
+  <head>
+    <title>ReadTxT - 解析管理</title>
+    <meta name="viewport" content="width=device-width" />   
+    <link rel="shortcut icon" href="/favicon.ico" />
+  </head>  
+  <body>
+  
+    <p>
+      欢迎管理员 {{ nickname }}
+      <a href="{{ logout_url }}">注销</a>
+      <br/>
+      <a href="/admin/users">用户管理</a>
+      <a href='/admin/books'>书籍管理</a>   
+      <a href='/admin/parser'>解析管理</a>
+    </p>
+    
+    <p>
+    支持的网站：    
+    <ul>
+    {% for parser in parser_info %}      
+      <li><a href="{{ parser.site_url }}">{{ parser.site_name }}</a></li>
+    {% endfor %}
+    </ul>
+    
+    <p>---</p>
+    
+    <p>
+      <a href="/admin/parser/export">导出解析数据</a>
+    </p>
+    
+    <p>---</p>
+    
+    <p>从文件导入解析数据：</p>
+
+    <form action="/admin/parser/import" method="post" enctype="multipart/form-data">
+      <input type="file" name="xmlfile">
+      <input type="submit" value="上传数据">
+    </form>
+    
+    <p>
+      因为批量加入新书是在后台执行，因此在列表中显示有一定的延迟。    
+    </p>
+
+  </body>
+</html>

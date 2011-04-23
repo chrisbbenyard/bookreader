@@ -92,7 +92,7 @@ class Catalog(db.Model):
   book_ref = db.ReferenceProperty(Book, collection_name = 'catalogs', required=True)
   
   site = db.TextProperty() # 站点名称(通常是简称，显示给读者看的)  
-  book_url = db.TextProperty()	# 书页  
+  cover_url = db.TextProperty()	# 书页  
   
   chapter_url_prefix = db.TextProperty() # 章节URL列表中保持的是末尾部分，前面相同的保存为前缀
   chapter_url_list = db.ListProperty(db.Text) # 目录的链接列表，如果为空串，则表示为Part分割   
@@ -103,8 +103,8 @@ class Catalog(db.Model):
   def put_info(self, info):    
     if info.has_key('site'):
       self.site = info['site']
-    if info.has_key('book_url'):
-      self.book_url = info['book_url']
+    if info.has_key('cover_url'):
+      self.cover_url = info['cover_url']
     if info.has_key('chapter_url_list'):
       self.chapter_url_list = [db.Text(x.strip()) for x in info['chapter_url_list']]
     if info.has_key('chapter_title_list'):
@@ -119,7 +119,7 @@ class Catalog(db.Model):
   def get_info(self):
     return {
       'site': self.site,
-      'book_url': self.book_url,
+      'cover_url': self.cover_url,
       'update_date': self.update_date,
       'catalog_url': self.key().name(),
       'chapter_list': [ {'url': self.chapter_url_list[i], 'title': self.chapter_title_list[i]}
@@ -246,10 +246,10 @@ class Chapter(db.Model):
       }    
 
   def export_html(self):
-    return ''.join( ['<p>'+x+'</p>' for x in self.content_list] )
+    return ''.join( [u'<p>　　'+x+'</p>' for x in self.content_list] )
     
   def export_txt(self):
-    return self.chapter_title + '\r\n' + ''.join( ['\r\n'+x+'\r\n' for x in self.content_list] ) + '\r\n\r\n'
+    return self.chapter_title + '\r\n' + ''.join( [u'\r\n　　'+x+'\r\n' for x in self.content_list] ) + '\r\n\r\n'
     
 
 # 用户书签
@@ -277,7 +277,7 @@ class Bookmark(db.Model):
   author = db.TextProperty()  
   # from catalog
   site = db.TextProperty()
-  book_url = db.TextProperty()
+  cover_url = db.TextProperty()
   chapter_url_prefix = db.TextProperty()
   catalog_url = db.TextProperty()
   update_date = db.DateTimeProperty()  
@@ -306,7 +306,7 @@ class Bookmark(db.Model):
       self.catalog_ref = catalog_ref   
       self.site = catalog_ref.site
       self.catalog_url = catalog_ref.key().name()
-      self.book_url = catalog_ref.book_url 
+      self.cover_url = catalog_ref.cover_url 
       self.chapter_url_prefix = catalog_ref.chapter_url_prefix
       self.update_date = catalog_ref.update_date
       
@@ -349,7 +349,7 @@ class Bookmark(db.Model):
       'curr_url': self.curr_url,
       'next_url': self.next_url,
       'prev_url': self.prev_url, 
-      'book_url': self.book_url,
+      'cover_url': self.cover_url,
       'catalog_url': self.catalog_url,
       'update_date': self.update_date + datetime.timedelta(hours=time_delta),
       'add_date': self.add_date + datetime.timedelta(hours=time_delta),

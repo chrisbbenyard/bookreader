@@ -14,7 +14,10 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api.labs import taskqueue
 from google.appengine.api import memcache
+
 import Database
+import Parser
+
 
 def get_broken_bookmarks():
   all_bookmarks_query = Database.Bookmark.all() 
@@ -58,6 +61,7 @@ def get_all_lastcheck_keys():
 
 def get_all_chapter_keys():
   return [key for key in Database.Chapter.all(keys_only=True)]   
+   
   
 class AdminPage(webapp.RequestHandler):
   def get(self):
@@ -155,7 +159,7 @@ class DeleteBrokenChapters(webapp.RequestHandler):
     taskqueue.add(url='/admin/task/check_broken_chapters', params={})
     self.redirect('/admin')
 
-class UserManage(webapp.RequestHandler):
+class ManageUser(webapp.RequestHandler):
   def get(self):
     all_users_query = Database.User.all()
     all_users = []
@@ -186,7 +190,7 @@ class DeleteUser(webapp.RequestHandler):
     
     
     
-class BookManage(webapp.RequestHandler):
+class ManageBook(webapp.RequestHandler):
   def get(self):
     all_books_query = Database.Book.all()
     all_books = []
@@ -235,6 +239,45 @@ class DeleteCatalog(webapp.RequestHandler):
       self.response.out.write('The catalog does not exists!')
     
     self.redirect('/admin/books')
+    
+class ManageParser(webapp.RequestHandler):
+  def get(self): 
+    parser_info = Parser.get_parser_info()
+
+    template_values = {
+      'parser_info': parser_info,      
+      }
+
+    path = os.path.join(os.path.dirname(__file__), 'template/admin_parser.html')
+    self.response.out.write(template.render(path, template_values))   
+
+
+class ExportParser(webapp.RequestHandler):
+  def get(self):
+    xml_content = Parser.export_parser()
+         
+    if not xml_content:
+      self.response.out.write('Empty!')
+      return
+    
+    # 设置header
+    self.response.headers['Content-Type'] = 'application/octet-stream;charset=utf-8' 
+    self.response.headers['Content-Disposition'] = 'attachment;filename="parser.xml"'
+
+    self.response.out.write(xml_content)    
+
+
+    
+class ImportParser(webapp.RequestHandler):
+  def post(self):        
+    xml_file = self.request.get('xmlfile')
+    Parser.import_parser(xml_file)    
+    self.redirect('/admin/parser')
+
+    
+
+        
+
 
     
 application = webapp.WSGIApplication(
@@ -248,11 +291,15 @@ application = webapp.WSGIApplication(
                                       ('/admin/delete_all_lastcheck', DeleteAllLastCheck), 
                                       ('/admin/delete_all_chapters', DeleteAllChapters),
                                       
-                                      ('/admin/users', UserManage),
+                                      ('/admin/users', ManageUser),
                                       ('/admin/user/delete/(.*)', DeleteUser),
-                                      ('/admin/books', BookManage),
+                                      ('/admin/books', ManageBook),
                                       ('/admin/book/delete/(.*)', DeleteBook),
                                       ('/admin/catalog/delete/(.*)', DeleteCatalog),
+                                      
+                                      ('/admin/parser', ManageParser),
+                                      ('/admin/parser/export', ExportParser),
+                                      ('/admin/parser/import', ImportParser),
                                      ],
                                      debug=True)
 
