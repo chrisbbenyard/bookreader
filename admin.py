@@ -3,7 +3,6 @@
 import os
 import urllib 
 import re
-import xml.etree.ElementTree as etree
 
 # 使用新的版本的django
 # from google.appengine.dist import use_library
@@ -17,7 +16,7 @@ from google.appengine.api.labs import taskqueue
 from google.appengine.api import memcache
 
 import Database
-from Parser import Parser
+import Parser
 
 
 def get_broken_bookmarks():
@@ -62,29 +61,7 @@ def get_all_lastcheck_keys():
 
 def get_all_chapter_keys():
   return [key for key in Database.Chapter.all(keys_only=True)]   
-  
-def export_parser():
-  return '<parser>\n' + ''.join([x.to_xml().encode('utf-8') for x in Parser.all() ]) + '</parser>'
-  
-def import_parser(xml_string):
-  tree = etree.fromstring(xml_string)
-  tree = etree.ElementTree(tree)  
-  for entity  in tree.findall('entity'):
-    key = entity.attrib['key']
-    key_name = Database.db.Key(encoded=key).name()
-    parser = Parser.get_or_insert(key_name)
-    for property in entity.findall('property'):
-      property_name = '_' + property.attrib['name']
-      property_type = property.attrib['type']
-      if property_type != 'null':
-        property_value = property.text
-        vars(parser)[property_name] = property_value
-    
-    parser.put()
-    
-
-
-    
+   
   
 class AdminPage(webapp.RequestHandler):
   def get(self):
@@ -182,7 +159,7 @@ class DeleteBrokenChapters(webapp.RequestHandler):
     taskqueue.add(url='/admin/task/check_broken_chapters', params={})
     self.redirect('/admin')
 
-class UserManage(webapp.RequestHandler):
+class ManageUser(webapp.RequestHandler):
   def get(self):
     all_users_query = Database.User.all()
     all_users = []
@@ -213,7 +190,7 @@ class DeleteUser(webapp.RequestHandler):
     
     
     
-class BookManage(webapp.RequestHandler):
+class ManageBook(webapp.RequestHandler):
   def get(self):
     all_books_query = Database.Book.all()
     all_books = []
@@ -264,10 +241,11 @@ class DeleteCatalog(webapp.RequestHandler):
     self.redirect('/admin/books')
     
 class ManageParser(webapp.RequestHandler):
-  def get(self):
+  def get(self): 
+    parser_info = Parser.get_parser_info()
 
     template_values = {
-      
+      'parser_info': parser_info,      
       }
 
     path = os.path.join(os.path.dirname(__file__), 'template/admin_parser.html')
@@ -276,7 +254,7 @@ class ManageParser(webapp.RequestHandler):
 
 class ExportParser(webapp.RequestHandler):
   def get(self):
-    xml_content = export_parser()
+    xml_content = Parser.export_parser()
          
     if not xml_content:
       self.response.out.write('Empty!')
@@ -291,16 +269,9 @@ class ExportParser(webapp.RequestHandler):
 
     
 class ImportParser(webapp.RequestHandler):
- 
-
-  def post(self):    
-    
+  def post(self):        
     xml_file = self.request.get('xmlfile')
-    # print self.request
-    # print xml_file
-    # print type(xml_file)
-    import_parser(xml_file)
-    
+    Parser.import_parser(xml_file)    
     self.redirect('/admin/parser')
 
     
@@ -320,9 +291,9 @@ application = webapp.WSGIApplication(
                                       ('/admin/delete_all_lastcheck', DeleteAllLastCheck), 
                                       ('/admin/delete_all_chapters', DeleteAllChapters),
                                       
-                                      ('/admin/users', UserManage),
+                                      ('/admin/users', ManageUser),
                                       ('/admin/user/delete/(.*)', DeleteUser),
-                                      ('/admin/books', BookManage),
+                                      ('/admin/books', ManageBook),
                                       ('/admin/book/delete/(.*)', DeleteBook),
                                       ('/admin/catalog/delete/(.*)', DeleteCatalog),
                                       

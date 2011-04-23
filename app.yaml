@@ -50,8 +50,10 @@ handlers:
 - url: /book/.*
   script: readtxt.py
   
-  
-  
+# help
+- url: /help.html
+  script: readtxt.py
+
 
 # background task  
 - url: /atom/.*
@@ -75,8 +77,10 @@ handlers:
   script: admin.py
   login: admin
   
+
   
-# other static pages such as help.html, policy.html  
+  
+# other static pages
 
 - url: /image
   static_dir: image

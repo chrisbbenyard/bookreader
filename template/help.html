@@ -31,7 +31,7 @@
 <a name="what" id="what"></a>
 <h2>ReadTxT 是做什么的？</h2>
 <p>
-  ReadTxT 是为了使阅读网络小说更方便而设计的。它支持常见的网络文学站点，比如：起点中文网、飞库电子书等。用户可以在登录后统一管理各个站点自己喜欢的书目，并保存阅读书签，实现一站式阅读。自动抓取最新的章节。
+  ReadTxT 是为了使阅读网络小说更方便而设计的。它支持常见的网络文学站点，比如：起点中文网、纵横中文网等。用户可以在登录后统一管理各个站点自己喜欢的书目，并保存阅读书签。应用会自动抓取最新的章节，实现一站式阅读。
 </p>
 
 <a name="login" id="login"></a>
@@ -51,7 +51,7 @@
     <li>导出/导入书签：首页 -> 书签管理 -> 上方的“导出书签/批量加入”。</li>
     <li>阅读：在首页点击相应链接。</li>
     <li>查看目录：在书签管理或者章节阅读界面选择“目录”。</li>
-    <li>更新：自动后台更新，心急的也可以点击首页的快速更新。</li>
+    <li>更新：自动后台更新，心急的话也可以点击首页的快速更新。</li>
   </ul>
 </p>
 </p>
@@ -80,15 +80,11 @@
 <a name="support" id="support"></a>
 <h2>支持哪些网站？</h2>
 <p>
-  目前支持网站：
+  应用以插件形式支持网站，适合于国内绝大部分小说网站，具体支持的网站取决于应用管理员设置的解析器。当前应用支持的网站为：
   <ul>
-    <li><a href="http://www.qidian.com">起点中文网</a></li>
-    <li><a href="http://www.zongheng.com/">纵横中文网</a></li>
-    <li><a href="http://www.feiku.com/index.html">飞库网</a></li>
-    <li><a href="http://www.bingdi.com">冰地小说</a>(醉露书院,涅破小说)</li>
-    <li><a href="http://www.101du.net/">沸腾文学</a></li>
-    <li><a href="http://www.16kxs.com/">16K小说网</a></li>
-    <li><a href="http://www.lxwxw.com/">就爱读书</a></li>
+    {% for parser in parser_info %}      
+      <li><a href="{{ parser.site_url }}">{{ parser.site_name }}</a></li>
+    {% endfor %}
   </ul>
 </p>
 

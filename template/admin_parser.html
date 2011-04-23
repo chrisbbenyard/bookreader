@@ -15,15 +15,26 @@
       <a href='/admin/books'>书籍管理</a>   
       <a href='/admin/parser'>解析管理</a>
     </p>
-
+    
+    <p>
+    支持的网站：    
+    <ul>
+    {% for parser in parser_info %}      
+      <li><a href="{{ parser.site_url }}">{{ parser.site_name }}</a></li>
+    {% endfor %}
+    </ul>
+    
+    <p>---</p>
     
     <p>
       <a href="/admin/parser/export">导出解析数据</a>
     </p>
+    
+    <p>---</p>
 
     <form action="/admin/parser/import" method="post" enctype="multipart/form-data">
       <input type="file" name="xmlfile">
-      <input type="submit" value="上传">
+      <input type="submit" value="上传数据">
     </form>
     
     <p>

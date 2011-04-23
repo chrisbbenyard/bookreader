@@ -63,89 +63,6 @@ def put_into_dict(d, key, value):
 #   url_info  相关的一些信息
 def get_parser(url):    
   
-
-
-  ###########  
-  parser = Parser.get_or_insert('http://www.qidian.com')    
-  parser.site_coding = 'gbk'
-  parser.site_name = u'起点中文网'
-  parser.site_short_name = u'起点'
-  parser.site_description = ''
-  parser.identifier_cover = '/Book/'
-  parser.identifier_catalog = ''
-  parser.identifier_chapter = ','
-  
-  parser.title_xpath = "//div[@id='divBookInfo']/div[@class='title']/h1"
-  parser.author_xpath = "//div[@id='divBookInfo']/div[@class='title']/a"
-  parser.update_date_re = u'\s*(\d*)-(\d*)-(\d*)\s*(\d*):(\d*)'
-  parser.last_url_xpath = "//*[@id='readP']/div[@class='title']/h3/a"
-  parser.last_url_replace_re = '/BookReader/'
-  parser.last_url_replace_string = ''
-  parser.chapter_url_prefix_replace_re = '.*'
-  parser.chapter_url_prefix_replace_string = 'http://www.qidian.com/BookReader/'
-  
-  parser.cover2catalog_re = '/Book/'
-  parser.cover2catalog_string = '/BookReader/'
-  parser.catalog2cover_re = '/BookReader/'
-  parser.catalog2cover_string = '/Book/'
-  parser.chapter2cover_re = r'/BookReader/(\d*),\d*'
-  parser.chapter2cover_string = r'/Book/\1'
-  
-  parser.vol_and_chapter_list_re = "//div[@id='content']//b | //div[@id='content']//div[@class='list']//a"  
-  parser.vol_vip_string = u"VIP卷"
-  
-  parser.chapter_title_xpath ='//*[@id="lbChapterName"]'
-  parser.content_link_xpath = "//div[@id='content']/script"
-  parser.content_xpath = ''
-  
-  parser.content_format_re = u"document\.write\(\'(.*?)((<a href=http://www.qidian.com>)+.*|\'\);)"
-  parser.content_format_string = "\\1"
-  parser.content_split_string = '<p>'
-  parser.put()
-  ##
-  
-  ###########  
-  parser = Parser.get_or_insert('http://www.niepo.net')    
-  parser.site_coding = 'gbk'
-  parser.site_name = u'涅破小说网'
-  parser.site_short_name = u'涅破'
-  parser.site_description = ''
-  parser.identifier_cover = 'book'
-  parser.identifier_catalog = 'index'
-  parser.identifier_chapter = ''
-  
-  parser.title_xpath = '//h1'
-  parser.author_re = u'者：\s*([^<]*)</td>'
-  parser.update_date_re = u'最后更新：(\d*)-(\d*)-(\d*)'
-  parser.last_url_xpath = "//div[@id='content']/table/tbody/tr[4]/td/table/tbody/tr/td[2]/a[2]"  
-  parser.last_url_replace_re = r'.*/'
-  parser.last_url_replace_string = ''
-  parser.chapter_url_prefix_replace_re = '.*'
-  parser.chapter_url_prefix_replace_string = 'http://www.niepo.net/reader/'
-  
-  parser.cover2catalog_re = '/book/'
-  parser.cover2catalog_string = '/index/'
-  parser.catalog2cover_re = '/index/'
-  parser.catalog2cover_string = '/book/'
-  parser.chapter2cover_re = r'/reader/(\d*)-\d*'
-  parser.chapter2cover_string = r'/book/\1'
-  
-  parser.vol_and_chapter_list_re = "//td[@class='vcss'] | //td[@class='ccss']/a"  
-  parser.vol_vip_string = '' 
-  parser.url_remove_prefix_re = '/reader/'
-  parser.url_remove_prefix_string = ''
-  
-  
-  parser.chapter_title_xpath = "//div[@id='title']"
-  parser.content_link_xpath = ''
-  parser.content_xpath = "//div[@id='content']"
-  
-  parser.content_format_re = ''
-  parser.content_format_string = ''
-  parser.content_split_string = '<br />'
-  parser.put()
-  ##  
-  
   ## 使用url前部分作为辨识
   key_name_list = [key.name() for key in Parser.all(keys_only=True)]
   
@@ -309,7 +226,10 @@ def parse_chapter(chapter_url, parser):
   if parser.content_format_re:
     chapter_content = re.sub(parser.content_format_re, parser.content_format_string, chapter_content) 
   paragraph_list = chapter_content.split(parser.content_split_string)
-  paragraph_list = [x.strip() for x in paragraph_list if x.strip()]  
+  paragraph_list = [x.strip() for x in paragraph_list if x.strip()] 
+  if parser.content_remove_re:
+    remove_re = re.compile(parser.content_remove_re)
+    paragraph_list = [remove_re.sub('',x) for x in paragraph_list]
   put_into_dict(parse_result, 'content_list', paragraph_list)
   put_into_dict(parse_result, 'content_type', 'text')
     
