@@ -13,9 +13,11 @@ import xml.etree.ElementTree as etree
 
 
 # 解析网站所需的信息
-# key_name = [url] 
+# key_name = [identifier] 
+# 注意不要数字开头，比如92to就不行，使用http://www.92to.com代替 
 class Parser(db.Model):    
   ## 常规项目
+  site_url = db.TextProperty()            # 网站地址
   site_coding = db.TextProperty()         # 网站编码
   site_name = db.TextProperty()           # 网站名称
   site_short_name = db.TextProperty()     # 网站简略名称，用于显示，通常为2个汉字
@@ -62,7 +64,7 @@ class Parser(db.Model):
   content_xpath = db.TextProperty()         # 内容解析
   content_format_re = db.TextProperty()     # 格式化文本
   content_format_string = db.TextProperty() # ..
-  content_split_string = db.TextProperty()  # 文本分段
+  content_split_re = db.TextProperty()  # 文本分段
   content_remove_re = db.TextProperty()     # 移除
   
 
@@ -98,7 +100,7 @@ def get_parser_info():
   for parser in Parser.all():
     parser_info.append({
       'site_name': parser.site_name,
-      'site_url': parser.key().name(),        
+      'site_url': parser.site_url,              
       })
   return parser_info
     

@@ -104,8 +104,10 @@ def get_parser(url):
         if parser.chapter2cover_re:
           url_info['cover_url']= re.sub(parser.chapter2cover_re, parser.chapter2cover_string, url)        
       
-    
-  return (url_info, parser)
+  if url_info:  
+    return (url_info, parser)
+  else:    
+    return (None, None)
   
     
 def get_data(url):
@@ -210,7 +212,7 @@ def parse_catalog(catalog_url, parser):
 def parse_chapter(chapter_url, parser):
   fetch_result = urlfetch.fetch(chapter_url, allow_truncated=True)  
   html = fetch_result.content.decode(parser.site_coding, 'ignore')
-  document = BSXPathEvaluator(html)
+  document = BSXPathEvaluator(html, convertEntities=BeautifulSoup.HTML_ENTITIES) # 转换实体字符
   
   parse_result = {} 
 
@@ -225,7 +227,7 @@ def parse_chapter(chapter_url, parser):
   # 开始格式化文本
   if parser.content_format_re:
     chapter_content = re.sub(parser.content_format_re, parser.content_format_string, chapter_content) 
-  paragraph_list = chapter_content.split(parser.content_split_string)
+  paragraph_list = re.split(parser.content_split_re, chapter_content)
   paragraph_list = [x.strip() for x in paragraph_list if x.strip()] 
   if parser.content_remove_re:
     remove_re = re.compile(parser.content_remove_re)
