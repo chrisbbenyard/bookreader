@@ -96,7 +96,7 @@ class MainPage(webapp.RequestHandler):
       return
     
     user = user_info['user']    
-    
+    # datetime使用str是为了包括和None比较的情况
     bookmarks = sorted( [bm.get_info() for bm in user.bookmarks], key = lambda x:x['update_date'], reverse = True)
     
     
