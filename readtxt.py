@@ -543,6 +543,8 @@ def task_add_book(user_info, url):
   if book_info == None:
     return 'Error: URL is not supported!'
   
+  url_type = book_info['url_type']
+  
   # 首先加入书页信息，获取必备的数据
   if book_info['cover_url']:
     book_info.update( BookParser.get_data(book_info['cover_url']) )
@@ -577,14 +579,14 @@ def task_add_book(user_info, url):
   # 用户想要添加的章节
   curr_url = None
   # 具体章节
-  if book_info['url_type'] == 'chapter':     
+  if url_type == 'chapter':     
     curr_url = url
   # 书页
-  elif book_info['url_type'] == 'book':       
+  elif url_type == 'cover':       
     if book_info.has_key('last_url'):
       curr_url = book_info['last_url']
   # 目录
-  elif book_info['url_type'] == 'catalog':
+  elif url_type == 'catalog':
     curr_index = catalog.find_first_chapter_index()
     if curr_index != None:
       curr_url = catalog.chapter_url_list[curr_index]
