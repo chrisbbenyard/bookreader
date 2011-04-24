@@ -11,26 +11,26 @@ from Parser import Parser
 
 def get_xpath_string(document, xpath):
   try:
-    return unicode(document.getFirstItem(xpath).string).strip('\r\n ')
+    return unicode(document.getFirstItem(xpath).contents[0]).strip()
   except:
     return None
 
 def get_xpath_contents(document, xpath):
   try:
-    return ''.join( [unicode(x) for x in document.getFirstItem(xpath).contents] ).strip('\r\n ')
+    return ''.join( [unicode(x) for x in document.getFirstItem(xpath).contents] ).strip()
   except:
     return None    
 
 ## 废弃    
 def get_xpath_unicode(document, xpath):
   try:
-    return unicode(document.getFirstItem(xpath)).strip('\r\n ')
+    return unicode(document.getFirstItem(xpath)).strip()
   except:
     return None
   
 def get_xpath_attr(document, xpath, attr):
   try:
-    return ((document.getFirstItem(xpath))[attr]).strip('\r\n ')
+    return ((document.getFirstItem(xpath))[attr]).strip()
   except:
     return None
     
@@ -167,7 +167,7 @@ def parse_cover(cover_url, parser):
     
   last_url = get_xpath_attr(document, parser.last_url_xpath, 'href')
   if last_url:      
-    put_into_dict(parse_result, 'last_url', re.sub(parser.last_url_replace_re, parser.last_url_replace_string, last_url ) ) 
+    put_into_dict(parse_result, 'last_url', re.sub(parser.last_url_remove_prefix_re, '', last_url ) ) 
     put_into_dict(parse_result, 'chapter_url_prefix', re.sub(parser.chapter_url_prefix_replace_re, parser.chapter_url_prefix_replace_string, last_url ))
   
   return parse_result
@@ -185,6 +185,10 @@ def parse_catalog(catalog_url, parser):
  
   chapter_url_list = []
   chapter_title_list = []
+  
+  if parser.url_remove_prefix_re: # 加速，下面要重复使用
+    url_remove_prefix_re = re.compile(parser.url_remove_prefix_re)
+  
   for i in vol_list:  
     if i.name != 'a':  
       # 判断是否解析到了VIP卷
@@ -198,7 +202,7 @@ def parse_catalog(catalog_url, parser):
     else:            
       url = i['href']
       if parser.url_remove_prefix_re:
-        url = re.sub(parser.url_remove_prefix_re, parser.url_remove_prefix_string, url)
+        url = url_remove_prefix_re.sub('', url)
       chapter_url_list.append( url ) 
       chapter_title_list.append( unicode(i.string) )
         
@@ -223,15 +227,23 @@ def parse_chapter(chapter_url, parser):
     chapter_content = urlfetch.fetch(content_link, allow_truncated=True).content.decode(parser.site_coding, 'ignore')
   else:
     chapter_content = get_xpath_contents(document, parser.content_xpath)
-      
+  
   # 开始格式化文本
+  
   if parser.content_format_re:
     chapter_content = re.sub(parser.content_format_re, parser.content_format_string, chapter_content) 
-  paragraph_list = re.split(parser.content_split_re, chapter_content)
-  paragraph_list = [x.strip() for x in paragraph_list if x.strip()] 
+ 
+  if parser.content_split_re:
+    paragraph_list = re.split(parser.content_split_re, chapter_content)
+  else:
+    paragraph_list = [chapter_content]
+    
   if parser.content_remove_re:
     remove_re = re.compile(parser.content_remove_re)
-    paragraph_list = [remove_re.sub('',x) for x in paragraph_list]
+    paragraph_list = [remove_re.sub('',x) for x in paragraph_list if x]
+    
+  paragraph_list = [x.strip() for x in paragraph_list if x.strip()] 
+
   put_into_dict(parse_result, 'content_list', paragraph_list)
   put_into_dict(parse_result, 'content_type', 'text')
     
