@@ -69,27 +69,26 @@ def get_parser(url):
   key_name_list = [key.name() for key in Parser.all(keys_only=True)]
   
   ##
-  url_lower = url.lower()
   url_info = {}
   parser = None
   ##
   for key_name in key_name_list:    
-    if url_lower.find(key_name) != -1:    
+    if url.find(key_name) != -1:    
    
       parser = Parser.get_by_key_name(key_name)    
       ##
       url_info['site'] = parser.site_short_name  
       
       ## url类型
-      is_cover = parser.identifier_cover.lower()
-      is_catalog = parser.identifier_catalog.lower()
-      is_chapter = parser.identifier_chapter.lower()   
+      r_cover = parser.identifier_cover
+      r_catalog = parser.identifier_catalog
+      r_chapter = parser.identifier_chapter
       url_type = None
-      if (is_cover and url_lower.find(is_cover)!=-1) or (not is_cover and url_type == None):
+      if (r_cover and re.search(r_cover, url)) or (not r_cover and url_type == None):
         url_type = 'cover'
-      if (is_catalog and url_lower.find(is_catalog)!=-1) or (not is_catalog and url_type == None):
+      if (r_catalog and re.search(r_catalog, url)) or (not r_catalog and url_type == None):
         url_type = 'catalog'
-      if (is_chapter and url_lower.find(is_chapter)!=-1) or (not is_chapter and url_type == None):
+      if (r_chapter and re.search(r_chapter, url)) or (not r_chapter and url_type == None):
         url_type = 'chapter'        
       url_info['url_type'] = url_type  
       ## url信息
@@ -181,7 +180,7 @@ def parse_catalog(catalog_url, parser):
   
   parse_result = {} 
   
-  vol_list = document.getItemList(parser.vol_and_chapter_list_re)
+  vol_list = document.getItemList(parser.vol_and_chapter_xpath)
  
   chapter_url_list = []
   chapter_title_list = []
@@ -204,7 +203,7 @@ def parse_catalog(catalog_url, parser):
       if parser.url_remove_prefix_re:
         url = url_remove_prefix_re.sub('', url)
       chapter_url_list.append( url ) 
-      chapter_title_list.append( unicode(i.string) )
+      chapter_title_list.append( unicode(i.contents[0]) )
         
   put_into_dict(parse_result, 'chapter_url_list', chapter_url_list)
   put_into_dict(parse_result, 'chapter_title_list', chapter_title_list)
@@ -222,16 +221,23 @@ def parse_chapter(chapter_url, parser):
 
   put_into_dict(parse_result, 'chapter_title', get_xpath_string(document, parser.chapter_title_xpath))
 
-  if parser.content_link_xpath:  # 就是起点...
-    content_link = get_xpath_attr(document, parser.content_link_xpath, 'src')    
-    chapter_content = urlfetch.fetch(content_link, allow_truncated=True).content.decode(parser.site_coding, 'ignore')
+  if parser.content_link_re:  # 比如起点
+    content_link = get_re_first(html, parser.content_link_re) 
+    if not content_link:
+      return parse_result
+    if parser.content_link_prefix:
+      content_link = parser.content_link_prefix + content_link
+    chapter_content = urlfetch.fetch( content_link, 
+                                      allow_truncated=True,
+                                      headers = {'Referer': chapter_url}  # 有的网站防止盗链，需要加上这个
+                                      ).content.decode(parser.site_coding, 'ignore')
   else:
     chapter_content = get_xpath_contents(document, parser.content_xpath)
   
   # 开始格式化文本
-  
-  if parser.content_format_re:
-    chapter_content = re.sub(parser.content_format_re, parser.content_format_string, chapter_content) 
+
+  if parser.content_extract_re:
+    chapter_content = get_re_first(chapter_content, parser.content_extract_re) 
  
   if parser.content_split_re:
     paragraph_list = re.split(parser.content_split_re, chapter_content)
