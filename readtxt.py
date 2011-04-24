@@ -96,7 +96,7 @@ class MainPage(webapp.RequestHandler):
       return
     
     user = user_info['user']    
-    
+    # datetime使用str是为了包括和None比较的情况
     bookmarks = sorted( [bm.get_info() for bm in user.bookmarks], key = lambda x:x['update_date'], reverse = True)
     
     
@@ -148,7 +148,7 @@ class AddBook(webapp.RequestHandler):
 
     result = task_add_book(user_info, url)
        
-    if type(result) == str or type(result) == unicode:  # result是字符串表明出错
+    if result:  # result不是None则有错误信息的字符串
       self.response.out.write(result)
       return
     
@@ -211,7 +211,7 @@ class ReadChapter(webapp.RequestHandler):
       return
        
     chapter = task_get_chapter(bookmark.curr_url, bookmark.catalog_ref)
-    if type(chapter) == str or type(chapter) == unicode: # 获取章节失败
+    if not isinstance(chapter, Database.Chapter): # 获取章节失败
       self.response.out.write(chapter)
       return
       
@@ -238,7 +238,7 @@ class DownloadBook(webapp.RequestHandler):
     for chapter_url in catalog.chapter_url_list[curr_index:]:           
       if chapter_url:
         chapter = task_get_chapter(chapter_url, catalog)
-        if type(chapter) == str or type(chapter) == unicode: # 获取章节失败
+        if not isinstance(chapter, Database.Chapter): # 获取章节失败
             self.response.out.write(chapter)
    
         txt_content = txt_content + chapter.export_txt()
@@ -492,7 +492,7 @@ class UpdateBook(webapp.RequestHandler):
           return
         
         elif op == 'reload': # 更新当前章节
-          chapter = task_get_chapter(bookmark.curr_url, bookmark.catalog_ref, reload = True)
+          task_get_chapter(bookmark.curr_url, bookmark.catalog_ref, reload = True)
           self.redirect('/bookmark/read/'+bookmark_id)
           return 
         
@@ -522,7 +522,7 @@ class UpdateBook(webapp.RequestHandler):
 
     result = task_add_book(user_info, url)
        
-    if type(result) == str or type(result) == unicode: # result不是None
+    if result: # result不是None
       self.response.out.write(result)
       return
     
@@ -543,6 +543,8 @@ def task_add_book(user_info, url):
   if book_info == None:
     return 'Error: URL is not supported!'
   
+  url_type = book_info['url_type']
+  
   # 首先加入书页信息，获取必备的数据
   if book_info['cover_url']:
     book_info.update( BookParser.get_data(book_info['cover_url']) )
@@ -553,7 +555,7 @@ def task_add_book(user_info, url):
            book_info.has_key('title') and 
            book_info.has_key('catalog_url') and 
            book_info.has_key('chapter_url_prefix') ):      
-    return 'Error: The necessary information is not complete!'   + '\r\n' + str(book_info)
+    return 'Error: The necessary information is not complete!' + '<br />' + str(book_info)
   author = book_info['author']
   title = book_info['title']
   catalog_url = book_info['catalog_url']
@@ -577,14 +579,14 @@ def task_add_book(user_info, url):
   # 用户想要添加的章节
   curr_url = None
   # 具体章节
-  if book_info['url_type'] == 'chapter':     
+  if url_type == 'chapter':     
     curr_url = url
   # 书页
-  elif book_info['url_type'] == 'book':       
+  elif url_type == 'cover':       
     if book_info.has_key('last_url'):
       curr_url = book_info['last_url']
   # 目录
-  elif book_info['url_type'] == 'catalog':
+  elif url_type == 'catalog':
     curr_index = catalog.find_first_chapter_index()
     if curr_index != None:
       curr_url = catalog.chapter_url_list[curr_index]
@@ -712,7 +714,7 @@ class Atom(webapp.RequestHandler):
     chapter_list = []
     for url in url_list:
       chapter = task_get_chapter(url, catalog)
-      if type(chapter) != str and type(chapter) != unicode:
+      if isinstance(chapter, Database.Chapter):
         chapter_list.append(chapter.get_info())  
       
     template_values = {

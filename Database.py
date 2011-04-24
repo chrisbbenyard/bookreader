@@ -350,11 +350,14 @@ class Bookmark(db.Model):
       'next_url': self.next_url,
       'prev_url': self.prev_url, 
       'cover_url': self.cover_url,
-      'catalog_url': self.catalog_url,
-      'update_date': self.update_date + datetime.timedelta(hours=time_delta),
+      'catalog_url': self.catalog_url,      
       'add_date': self.add_date + datetime.timedelta(hours=time_delta),
       'modified_date': self.modified_date + datetime.timedelta(hours=time_delta),
       }
+    if self.update_date:
+      info['update_date'] = str( self.update_date + datetime.timedelta(hours=time_delta) ) 
+    else:
+      info['update_date'] = None
     id = str(self.key().id())
     info['read_link'] = '/bookmark/read/' + id
     info['select_link'] = '/bookmark/select/' + id + '/'

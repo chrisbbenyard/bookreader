@@ -11,25 +11,26 @@ from Parser import Parser
 
 def get_xpath_string(document, xpath):
   try:
-    return unicode(document.getFirstItem(xpath).string).strip('\r\n ')
+    return unicode(document.getFirstItem(xpath).contents[0]).strip()
   except:
     return None
 
 def get_xpath_contents(document, xpath):
   try:
-    return u''.join( [unicode(x) for x in document.getFirstItem(xpath).contents] ).strip('\r\n ')
+    return ''.join( [unicode(x) for x in document.getFirstItem(xpath).contents] ).strip()
   except:
     return None    
-    
+
+## 废弃    
 def get_xpath_unicode(document, xpath):
   try:
-    return unicode(document.getFirstItem(xpath)).strip('\r\n ')
+    return unicode(document.getFirstItem(xpath)).strip()
   except:
     return None
   
 def get_xpath_attr(document, xpath, attr):
   try:
-    return ((document.getFirstItem(xpath))[attr]).strip('\r\n ')
+    return ((document.getFirstItem(xpath))[attr]).strip()
   except:
     return None
     
@@ -40,6 +41,7 @@ def get_re_first(html, r):
       return result[0]  
   return None
 
+# 获取的结构可能比较复杂，所以结果可能需要strip()
 def get_item(document, html, xpath_string, re_exp):
  if xpath_string and re_exp:
    return get_re_first( get_xpath_contents(document, xpath_string), re_exp)
@@ -67,27 +69,26 @@ def get_parser(url):
   key_name_list = [key.name() for key in Parser.all(keys_only=True)]
   
   ##
-  url_lower = url.lower()
   url_info = {}
   parser = None
   ##
   for key_name in key_name_list:    
-    if url_lower.find(key_name) != -1:    
+    if url.find(key_name) != -1:    
    
       parser = Parser.get_by_key_name(key_name)    
       ##
       url_info['site'] = parser.site_short_name  
       
       ## url类型
-      is_cover = parser.identifier_cover.lower()
-      is_catalog = parser.identifier_catalog.lower()
-      is_chapter = parser.identifier_chapter.lower()   
+      r_cover = parser.identifier_cover
+      r_catalog = parser.identifier_catalog
+      r_chapter = parser.identifier_chapter
       url_type = None
-      if (is_cover and url_lower.find(is_cover)!=-1) or (not is_cover and url_type == None):
+      if (r_cover and re.search(r_cover, url)) or (not r_cover and url_type == None):
         url_type = 'cover'
-      if (is_catalog and url_lower.find(is_catalog)!=-1) or (not is_catalog and url_type == None):
+      if (r_catalog and re.search(r_catalog, url)) or (not r_catalog and url_type == None):
         url_type = 'catalog'
-      if (is_chapter and url_lower.find(is_chapter)!=-1) or (not is_chapter and url_type == None):
+      if (r_chapter and re.search(r_chapter, url)) or (not r_chapter and url_type == None):
         url_type = 'chapter'        
       url_info['url_type'] = url_type  
       ## url信息
@@ -144,7 +145,7 @@ def parse_cover(cover_url, parser):
 
   fetch_result = urlfetch.fetch(cover_url, allow_truncated=True)  
   html = fetch_result.content.decode(parser.site_coding, 'ignore')
-  document = BSXPathEvaluator(html)
+  document = BSXPathEvaluator(html, convertEntities=BeautifulSoup.HTML_ENTITIES) # 转换实体字符
   
   parse_result = {}   
 
@@ -161,13 +162,11 @@ def parse_cover(cover_url, parser):
   if update_date and len(update_date)>=3:
     update_date = [int(x) for x in update_date]
     put_into_dict( parse_result, 'update_date', datetime.datetime( *update_date ) + datetime.timedelta( hours=-8 ) )  
-  else:
-    (year, month, day) = (1900, 1, 1)
-     
-  
+
+    
   last_url = get_xpath_attr(document, parser.last_url_xpath, 'href')
   if last_url:      
-    put_into_dict(parse_result, 'last_url', re.sub(parser.last_url_replace_re, parser.last_url_replace_string, last_url ) ) 
+    put_into_dict(parse_result, 'last_url', re.sub(parser.last_url_remove_prefix_re, '', last_url ) ) 
     put_into_dict(parse_result, 'chapter_url_prefix', re.sub(parser.chapter_url_prefix_replace_re, parser.chapter_url_prefix_replace_string, last_url ))
   
   return parse_result
@@ -177,14 +176,18 @@ def parse_catalog(catalog_url, parser):
   
   fetch_result = urlfetch.fetch(catalog_url, allow_truncated=True)  
   html = fetch_result.content.decode(parser.site_coding, 'ignore')
-  document = BSXPathEvaluator(html)
+  document = BSXPathEvaluator(html, convertEntities=BeautifulSoup.HTML_ENTITIES) # 转换实体字符
   
   parse_result = {} 
   
-  vol_list = document.getItemList(parser.vol_and_chapter_list_re)
+  vol_list = document.getItemList(parser.vol_and_chapter_xpath)
  
   chapter_url_list = []
   chapter_title_list = []
+  
+  if parser.url_remove_prefix_re: # 加速，下面要重复使用
+    url_remove_prefix_re = re.compile(parser.url_remove_prefix_re)
+  
   for i in vol_list:  
     if i.name != 'a':  
       # 判断是否解析到了VIP卷
@@ -198,9 +201,9 @@ def parse_catalog(catalog_url, parser):
     else:            
       url = i['href']
       if parser.url_remove_prefix_re:
-        url = re.sub(parser.url_remove_prefix_re, parser.url_remove_prefix_string, url)
+        url = url_remove_prefix_re.sub('', url)
       chapter_url_list.append( url ) 
-      chapter_title_list.append( unicode(i.string) )
+      chapter_title_list.append( unicode(i.contents[0]) )
         
   put_into_dict(parse_result, 'chapter_url_list', chapter_url_list)
   put_into_dict(parse_result, 'chapter_title_list', chapter_title_list)
@@ -218,20 +221,35 @@ def parse_chapter(chapter_url, parser):
 
   put_into_dict(parse_result, 'chapter_title', get_xpath_string(document, parser.chapter_title_xpath))
 
-  if parser.content_link_xpath:  # 就是起点...
-    content_link = get_xpath_attr(document, parser.content_link_xpath, 'src')    
-    chapter_content = urlfetch.fetch(content_link, allow_truncated=True).content.decode(parser.site_coding, 'ignore')
+  if parser.content_link_re:  # 比如起点
+    content_link = get_re_first(html, parser.content_link_re) 
+    if not content_link:
+      return parse_result
+    if parser.content_link_prefix:
+      content_link = parser.content_link_prefix + content_link
+    chapter_content = urlfetch.fetch( content_link, 
+                                      allow_truncated=True,
+                                      headers = {'Referer': chapter_url}  # 有的网站防止盗链，需要加上这个
+                                      ).content.decode(parser.site_coding, 'ignore')
   else:
     chapter_content = get_xpath_contents(document, parser.content_xpath)
-      
+  
   # 开始格式化文本
-  if parser.content_format_re:
-    chapter_content = re.sub(parser.content_format_re, parser.content_format_string, chapter_content) 
-  paragraph_list = re.split(parser.content_split_re, chapter_content)
-  paragraph_list = [x.strip() for x in paragraph_list if x.strip()] 
+
+  if parser.content_extract_re:
+    chapter_content = get_re_first(chapter_content, parser.content_extract_re) 
+ 
+  if parser.content_split_re:
+    paragraph_list = re.split(parser.content_split_re, chapter_content)
+  else:
+    paragraph_list = [chapter_content]
+    
   if parser.content_remove_re:
     remove_re = re.compile(parser.content_remove_re)
-    paragraph_list = [remove_re.sub('',x) for x in paragraph_list]
+    paragraph_list = [remove_re.sub('',x) for x in paragraph_list if x]
+    
+  paragraph_list = [x.strip() for x in paragraph_list if x.strip()] 
+
   put_into_dict(parse_result, 'content_list', paragraph_list)
   put_into_dict(parse_result, 'content_type', 'text')
     
