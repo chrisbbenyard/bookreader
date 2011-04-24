@@ -46,8 +46,7 @@ class Parser(db.Model):
   update_date_re = db.TextProperty()      # ..
   
   last_url_xpath = db.TextProperty()      # 最后更新章节
-  last_url_replace_re = db.TextProperty()                 # 重整last_url
-  last_url_replace_string = db.TextProperty()             # ..
+  last_url_remove_prefix_re = db.TextProperty()           # 重整last_url
   chapter_url_prefix_replace_re = db.TextProperty()       # 章节url前缀
   chapter_url_prefix_replace_string = db.TextProperty()   # ..
   
@@ -56,7 +55,7 @@ class Parser(db.Model):
   vol_and_chapter_list_re = db.TextProperty()       # 卷和章节
   vol_vip_string = db.TextProperty()                # VIP卷，解析到此为止
   url_remove_prefix_re = db.TextProperty()          # 章节url处理
-  url_remove_prefix_string = db.TextProperty()      # ..
+
   
   ## 章节
   chapter_title_xpath = db.TextProperty()   # 章节的标题
