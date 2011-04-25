@@ -53,16 +53,21 @@ class Parser(db.Model):
   
   ## 目录  
   vol_and_chapter_xpath = db.TextProperty()       # 卷和章节
-  vol_vip_string = db.TextProperty()                # VIP卷，解析到此为止
-  url_remove_prefix_re = db.TextProperty()          # 章节url处理
+  vol_vip_string = db.TextProperty()              # VIP卷，解析到此为止
+  url_remove_prefix_re = db.TextProperty()        # 章节url处理
 
   
   ## 章节
-  chapter_title_xpath = db.TextProperty()   # 章节的标题
-  content_link_re = db.TextProperty()       # 内容链接解析(比如起点)  
-  content_link_prefix = db.TextProperty()   # 补全内容链接，有的时候和网站域名不是一个
-  content_xpath = db.TextProperty()         # 内容解析
-  content_extract_re = db.TextProperty()    # 进一步提取内容（提取出段落部分）
+  chapter_title_xpath = db.TextProperty()     # 章节的标题
+  content_link_re = db.TextProperty()         # 内容链接解析(比如起点)  
+  content_link_prefix = db.TextProperty()     # 补全内容链接，有的时候和网站域名不是一个
+  content_xpath = db.TextProperty()           # 内容解析
+  content_extract_re = db.TextProperty()      # 进一步提取内容（提取出段落部分）
+  
+  img_url_list_re = db.TextProperty()           # 主要图片分离的url
+  img_url_replace_re = db.TextProperty()        # url的处理
+  img_url_replace_string = db.TextProperty()    # .. 
+    
   content_split_re = db.TextProperty()      # 文本分段
   content_remove_re = db.TextProperty()     # 移除
   
