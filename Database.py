@@ -246,7 +246,10 @@ class Chapter(db.Model):
       }    
 
   def export_html(self):
-    return ''.join( [u'<p>　　'+x+'</p>' for x in self.content_list] )
+    if self.content_type == 'text':
+      return ''.join( [u'<p>　　'+x+'</p>' for x in self.content_list] )
+    else:
+      return ''.join( ['<img src="'+x+'"/><br/>' for x in self.content_list] )
     
   def export_txt(self):
     return self.chapter_title + '\r\n' + ''.join( [u'\r\n　　'+x+'\r\n' for x in self.content_list] ) + '\r\n\r\n'
