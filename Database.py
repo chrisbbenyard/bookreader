@@ -249,7 +249,7 @@ class Chapter(db.Model):
     if self.content_type == 'text':
       return ''.join( [u'<p>　　'+x+'</p>' for x in self.content_list] )
     else:
-      return ''.join( ['<img src="'+x+'"/><br/>' for x in self.content_list] )
+      return ''.join( ['<img src="img/'+x+'"/><br/>' for x in self.content_list] )
     
   def export_txt(self):
     return self.chapter_title + '\r\n' + ''.join( [u'\r\n　　'+x+'\r\n' for x in self.content_list] ) + '\r\n\r\n'
@@ -362,8 +362,8 @@ class Bookmark(db.Model):
     else:
       info['update_date'] = None
     id = str(self.key().id())
-    info['read_link'] = '/bookmark/read/' + id
-    info['select_link'] = '/bookmark/select/' + id + '/'
+    info['read_link'] = '/bookmark/' + id + '/read'
+    info['select_link'] = '/bookmark/' + id + '/select/'
     if self.next_url:
       info['next_link'] = info['select_link'] + self.next_url
     else:
@@ -373,10 +373,10 @@ class Bookmark(db.Model):
     else:
       info['prev_link'] = None 
       
-    info['update_link'] = '/bookmark/update/' + id
-    info['delete_link'] = '/bookmark/delete/' + id
-    info['catalog_link'] = '/bookmark/catalog/' + id
-    info['download_link'] = '/bookmark/download/' + id
+    info['update_link'] = '/bookmark/' + id + '/update'
+    info['delete_link'] = '/bookmark/' + id + '/delete'
+    info['catalog_link'] = '/bookmark/' + id + '/catalog'
+    info['download_link'] = '/bookmark/' + id + '/download'
     
     return info
 
