@@ -13,6 +13,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api.labs import taskqueue
+from google.appengine.api import urlfetch
 
 import BookParser
 import Database
@@ -266,9 +267,29 @@ class SelectChapter(webapp.RequestHandler):
 
     bookmark.update_info(curr_url = chapter_url)        
   
-    self.redirect('/bookmark/read/'+bookmark_id)
+    self.redirect('/bookmark/' + bookmark_id + '/read')
     
+class LoadImage(webapp.RequestHandler):
+  def get(self, bookmark_id, image_url):
+    image_url = urllib.unquote(image_url)
+      
+    bookmark = Database.Bookmark.get_by_id( int(bookmark_id) )  
+    if bookmark == None:        
+      self.response.out.write('Error: Bookmark ID does not exist!')
+      return
+    
+    fetch_result = urlfetch.fetch(image_url, 
+                                  headers = {'Referer': bookmark.curr_url},
+                                  allow_truncated = True)  
+    image = fetch_result.content
+
+    self.response.headers['Content-Type'] = "image/png"
+    return self.response.out.write(image)
+
+
   
+
+      
 
 class BookmarkCatalog(webapp.RequestHandler):
   def get(self, bookmark_id):
@@ -450,20 +471,13 @@ class Help(webapp.RequestHandler):
      
      
 class UpdateBook(webapp.RequestHandler):
-  def get(self, id_op):
-    pos = id_op.find('/')
-    if pos == -1:
-      bookmark_id = id_op
-      op = None
-    else:
-      bookmark_id = id_op[0:pos]
-      op = urllib.unquote( id_op[ pos+1:len(id_op) ] )
-      
+    
+  def get(self, bookmark_id, op=None):     
       
     bookmark = Database.Bookmark.get_by_id( int(bookmark_id) )   
     
     if bookmark != None:         
-      if op == None: # 没有指定的更新内容，则显示更新选单页面
+      if op == None: # 显示页面
         bookmark_info = bookmark.get_info()
         catalog = bookmark.catalog_ref
         catalog_info = {}
@@ -484,31 +498,31 @@ class UpdateBook(webapp.RequestHandler):
           }
         path = os.path.join(os.path.dirname(__file__), 'template/update.html')
         self.response.out.write(template.render(path, template_values))
-      else:
-        if op == 'manual': # 手动更新          
-          catalog = bookmark.catalog_ref
-          result = task_update_catalog(catalog)            
-          self.redirect('/bookmark/update/'+bookmark_id)
-          return
-        
-        elif op == 'reload': # 更新当前章节
-          task_get_chapter(bookmark.curr_url, bookmark.catalog_ref, reload = True)
-          self.redirect('/bookmark/read/'+bookmark_id)
-          return 
-        
-        elif op == 'fetch': # 获取全部章节
-          catalog = bookmark.catalog_ref
-          catalog_url = catalog.key().name()          
-          for chapter_url in catalog.chapter_url_list:
-            if chapter_url:
-              taskqueue.add(url='/task/chapter', params={'catalog_url': catalog_url,
-                                                         'chapter_url': chapter_url})
-          self.redirect('/bookmark/update/'+bookmark_id)
-          return 
+      
+      elif op == 'manual': # 手动更新          
+        catalog = bookmark.catalog_ref
+        result = task_update_catalog(catalog)            
+        self.redirect('/bookmark/' + bookmark_id + '/update')
+        return
+      
+      elif op == 'reload': # 更新当前章节
+        task_get_chapter(bookmark.curr_url, bookmark.catalog_ref, reload = True)
+        self.redirect('/bookmark/' + bookmark_id + '/read')
+        return 
+      
+      elif op == 'fetch': # 获取全部章节
+        catalog = bookmark.catalog_ref
+        catalog_url = catalog.key().name()          
+        for chapter_url in catalog.chapter_url_list:
+          if chapter_url:
+            taskqueue.add(url='/task/chapter', params={'catalog_url': catalog_url,
+                                                       'chapter_url': chapter_url})
+        self.redirect('/bookmark/' + bookmark_id + '/update')
+        return 
 
-        else: # 指定网址更新，catalog是可知的
-          self.response.out.write('Error: Unknown operation: ' + op + '.')
-          return
+      else: # 指定网址更新，catalog是可知的
+        self.response.out.write('Error: Unknown operation: ' + op + '.')
+        return
         
     else:
       self.response.out.write('Error: ID does not exist!')
@@ -739,12 +753,14 @@ application = webapp.WSGIApplication(
                                       (r'/addbook/(.*)', AddBook),
                                       
                                       ('/bookmarks', ManageBookmark),
-                                      (r'/bookmark/read/(.*)', ReadChapter),                                     
-                                      (r'/bookmark/update/(.*)', UpdateBook),
-                                      (r'/bookmark/delete/(.*)', DeleteBookmark),
-                                      (r'/bookmark/catalog/(.*)', BookmarkCatalog),
-                                      (r'/bookmark/select/([^/]*)/(.*)', SelectChapter),
-                                      (r'/bookmark/download/(.*)', DownloadBook),
+                                      (r'/bookmark/([^/]*)/read', ReadChapter),
+                                      (r'/bookmark/([^/]*)/img/(.*)', LoadImage),                                      
+                                      (r'/bookmark/([^/]*)/update', UpdateBook),
+                                      (r'/bookmark/([^/]*)/update/(.*)', UpdateBook),
+                                      (r'/bookmark/([^/]*)/delete', DeleteBookmark),
+                                      (r'/bookmark/([^/]*)/catalog', BookmarkCatalog),
+                                      (r'/bookmark/([^/]*)/select/(.*)', SelectChapter),
+                                      (r'/bookmark/([^/]*)/download', DownloadBook),
                                       
                                       ('/books', ManageBook),
                                       (r'/book/delete/(.*)', DeleteBook), 
