@@ -221,37 +221,49 @@ def parse_chapter(chapter_url, parser):
 
   put_into_dict(parse_result, 'chapter_title', get_xpath_string(document, parser.chapter_title_xpath))
 
-  if parser.content_link_re:  # 比如起点
+  # 判断获取方式
+  if parser.content_link_re:  # from link
     content_link = get_re_first(html, parser.content_link_re) 
-    if not content_link:
-      return parse_result
-    if parser.content_link_prefix:
-      content_link = parser.content_link_prefix + content_link
-    chapter_content = urlfetch.fetch( content_link, 
-                                      allow_truncated=True,
-                                      headers = {'Referer': chapter_url}  # 有的网站防止盗链，需要加上这个
-                                      ).content.decode(parser.site_coding, 'ignore')
-  else:
+    if content_link:
+      if parser.content_link_prefix:
+        content_link = parser.content_link_prefix + content_link
+      chapter_content = urlfetch.fetch( content_link, 
+                                        allow_truncated=True,
+                                        headers = {'Referer': chapter_url} 
+                                        ).content.decode(parser.site_coding, 'ignore')
+    else:
+      chapter_content = None
+  else: # from xpath
     chapter_content = get_xpath_contents(document, parser.content_xpath)
-  
-  # 开始格式化文本
-
-  if parser.content_extract_re:
-    chapter_content = get_re_first(chapter_content, parser.content_extract_re) 
  
-  if parser.content_split_re:
-    paragraph_list = re.split(parser.content_split_re, chapter_content)
-  else:
-    paragraph_list = [chapter_content]
-    
-  if parser.content_remove_re:
-    remove_re = re.compile(parser.content_remove_re)
-    paragraph_list = [remove_re.sub('',x) for x in paragraph_list if x]
-    
-  paragraph_list = [x.strip() for x in paragraph_list if x.strip()] 
+  if chapter_content: # 开始格式化文本    
+    if parser.content_extract_re:
+      chapter_content = get_re_first(chapter_content, parser.content_extract_re) 
+   
+    if parser.content_split_re:
+      paragraph_list = re.split(parser.content_split_re, chapter_content)
+    else:
+      paragraph_list = [chapter_content]
+      
+    if parser.content_remove_re:
+      remove_re = re.compile(parser.content_remove_re)
+      paragraph_list = [remove_re.sub('',x) for x in paragraph_list if x]
+      
+    paragraph_list = [x.strip() for x in paragraph_list if x.strip()] 
 
-  put_into_dict(parse_result, 'content_list', paragraph_list)
-  put_into_dict(parse_result, 'content_type', 'text')
+    put_into_dict(parse_result, 'content_list', paragraph_list)
+    put_into_dict(parse_result, 'content_type', 'text')
+  
+  # 全局获取图片，如果成功，覆盖文字部分
+  if parser.img_url_list_re:
+    img_list = re.findall(parser.img_url_list_re, html)
+    
+    if img_list:
+      if parser.img_url_replace_re:
+        r_img_url_replace = re.compile(parser.img_url_replace_re)
+        img_list = [r_img_url_replace.sub(parser.img_url_replace_string, x) for x in img_list]
+      put_into_dict(parse_result, 'content_list', img_list)
+      put_into_dict(parse_result, 'content_type', 'image')
     
   return parse_result
   
