@@ -1,6 +1,6 @@
 <parser>
 <entity kind="Parser" key="agdyZWFkdHh0ciQLEgZQYXJzZXIiGGh0dHA6Ly9ib29rLnpvbmdoZW5nLmNvbQw">
-  <key>tag:readtxt.gmail.com,2011-04-25:Parser[agdyZWFkdHh0ciQLEgZQYXJzZXIiGGh0dHA6Ly9ib29rLnpvbmdoZW5nLmNvbQw]</key>
+  <key>tag:readtxt.gmail.com,2011-04-27:Parser[agdyZWFkdHh0ciQLEgZQYXJzZXIiGGh0dHA6Ly9ib29rLnpvbmdoZW5nLmNvbQw]</key>
   <property name="author_re" type="text"></property>
   <property name="author_xpath" type="text">/html/body/div[2][@class='bodycon']/div[5][@class='wrap']/div[2][@class='mainarea']/div[1][@class='bortable']/div[1][@class='work']/div[1][@class='wright']/h1/em/a</property>
   <property name="catalog2cover_re" type="text">/showchapter/</property>
@@ -11,8 +11,7 @@
   <property name="chapter_url_prefix_replace_re" type="text">(.*/).*</property>
   <property name="chapter_url_prefix_replace_string" type="text">\1</property>
   <property name="content_extract_re" type="text">&lt;p&gt;.*&lt;/p&gt;</property>
-  <property name="content_link_prefix" type="null"></property>
-  <property name="content_link_re" type="text"></property>
+  <property name="content_link_code" type="text"></property>
   <property name="content_remove_re" type="text">&lt;span.*/span&gt;</property>
   <property name="content_split_re" type="text">&lt;p&gt;|&lt;/p&gt;</property>
   <property name="content_xpath" type="text">//div[@id="readtext"]</property>
@@ -21,9 +20,7 @@
   <property name="identifier_catalog" type="text">/showchapter/</property>
   <property name="identifier_chapter" type="text">/chapter/</property>
   <property name="identifier_cover" type="text">/book/</property>
-  <property name="img_url_list_re" type="null"></property>
-  <property name="img_url_replace_re" type="null"></property>
-  <property name="img_url_replace_string" type="null"></property>
+  <property name="image_link_code" type="null"></property>
   <property name="last_url_remove_prefix_re" type="text">.*/</property>
   <property name="last_url_xpath" type="text">//div[@id='gxzj']/div[2][@class='info']/h3/a</property>
   <property name="site_coding" type="text">utf-8</property>
@@ -39,7 +36,7 @@
   <property name="vol_vip_string" type="text"></property>
 </entity>
 <entity kind="Parser" key="agdyZWFkdHh0ciALEgZQYXJzZXIiFGh0dHA6Ly93d3cuZHUxZHUuY29tDA">
-  <key>tag:readtxt.gmail.com,2011-04-25:Parser[agdyZWFkdHh0ciALEgZQYXJzZXIiFGh0dHA6Ly93d3cuZHUxZHUuY29tDA]</key>
+  <key>tag:readtxt.gmail.com,2011-04-27:Parser[agdyZWFkdHh0ciALEgZQYXJzZXIiFGh0dHA6Ly93d3cuZHUxZHUuY29tDA]</key>
   <property name="author_re" type="text">者：\s*([^&lt;]*)&lt;/div&gt;</property>
   <property name="author_xpath" type="text"></property>
   <property name="catalog2cover_re" type="text">/\Z</property>
@@ -50,8 +47,12 @@
   <property name="chapter_url_prefix_replace_re" type="text">(.*/).*</property>
   <property name="chapter_url_prefix_replace_string" type="text">http://www.du1du.com/\1</property>
   <property name="content_extract_re" type="text">document\.write\('(.*?)'\);</property>
-  <property name="content_link_prefix" type="text">http://r.wl01.com:88/novel</property>
-  <property name="content_link_re" type="text">\("(.*\.txt)"\)</property>
+  <property name="content_link_code" type="text">
+        def get_content_links(html):
+          r = '\((\d*),\s*"(\d*\.txt)"\)'
+          f = lambda x: 'http://r.wl01.com:88/novel/' + str(int(x[0])/1000+1) + '/' + str(int(x[0])%1000) + '/' + x[1]
+          return [f(x) for x in re.findall(r, html)]
+  </property>  
   <property name="content_remove_re" type="text"></property>
   <property name="content_split_re" type="text">&lt;br/&gt;</property>
   <property name="content_xpath" type="text"></property>
@@ -60,9 +61,12 @@
   <property name="identifier_catalog" type="text">/\Z</property>
   <property name="identifier_chapter" type="text">/book/\d*/\d*/\d*.html</property>
   <property name="identifier_cover" type="text">/book/\d*/\d*.html</property>
-  <property name="img_url_list_re" type="text">outputImg\("([^.]*\.gif)"\)</property>
-  <property name="img_url_replace_re" type="text">(.*)</property>
-  <property name="img_url_replace_string" type="text">http://r.wl01.com:88/novel\1</property>
+  <property name="image_link_code" type="text">  
+        def get_image_links(html):
+          r = 'outputImg\("([^.]*\.gif)"\)'
+          f = lambda x: 'http://r.wl01.com:88/novel/' + x
+          return [f(x) for x in re.findall(r, html)]  
+  </property>
   <property name="last_url_remove_prefix_re" type="text">.*/</property>
   <property name="last_url_xpath" type="text">//div[@id='novel_newest']/a</property>
   <property name="site_coding" type="text">gbk</property>
@@ -78,7 +82,7 @@
   <property name="vol_vip_string" type="text"></property>
 </entity>
 <entity kind="Parser" key="agdyZWFkdHh0ciALEgZQYXJzZXIiFGh0dHA6Ly93d3cubmllcG8ubmV0DA">
-  <key>tag:readtxt.gmail.com,2011-04-25:Parser[agdyZWFkdHh0ciALEgZQYXJzZXIiFGh0dHA6Ly93d3cubmllcG8ubmV0DA]</key>
+  <key>tag:readtxt.gmail.com,2011-04-27:Parser[agdyZWFkdHh0ciALEgZQYXJzZXIiFGh0dHA6Ly93d3cubmllcG8ubmV0DA]</key>
   <property name="author_re" type="text">者：\s*([^&lt;]*)&lt;/td&gt;</property>
   <property name="author_xpath" type="null"></property>
   <property name="catalog2cover_re" type="text">/index/</property>
@@ -89,8 +93,7 @@
   <property name="chapter_url_prefix_replace_re" type="text">.*</property>
   <property name="chapter_url_prefix_replace_string" type="text">http://www.niepo.net/reader/</property>
   <property name="content_extract_re" type="text"></property>
-  <property name="content_link_prefix" type="null"></property>
-  <property name="content_link_re" type="text"></property>
+  <property name="content_link_code" type="text"></property>
   <property name="content_remove_re" type="text">&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;</property>
   <property name="content_split_re" type="text">&lt;br /&gt;</property>
   <property name="content_xpath" type="text">//div[@id='content']</property>
@@ -99,9 +102,7 @@
   <property name="identifier_catalog" type="text">index</property>
   <property name="identifier_chapter" type="text"></property>
   <property name="identifier_cover" type="text">book</property>
-  <property name="img_url_list_re" type="null"></property>
-  <property name="img_url_replace_re" type="null"></property>
-  <property name="img_url_replace_string" type="null"></property>
+  <property name="image_link_code" type="null"></property>
   <property name="last_url_remove_prefix_re" type="text">.*/</property>
   <property name="last_url_xpath" type="text">//div[@id='content']/table/tbody/tr[4]/td/table/tbody/tr/td[2]/a[2]</property>
   <property name="site_coding" type="text">gbk</property>
@@ -117,7 +118,7 @@
   <property name="vol_vip_string" type="text"></property>
 </entity>
 <entity kind="Parser" key="agdyZWFkdHh0ciELEgZQYXJzZXIiFWh0dHA6Ly93d3cucWlkaWFuLmNvbQw">
-  <key>tag:readtxt.gmail.com,2011-04-25:Parser[agdyZWFkdHh0ciELEgZQYXJzZXIiFWh0dHA6Ly93d3cucWlkaWFuLmNvbQw]</key>
+  <key>tag:readtxt.gmail.com,2011-04-27:Parser[agdyZWFkdHh0ciELEgZQYXJzZXIiFWh0dHA6Ly93d3cucWlkaWFuLmNvbQw]</key>
   <property name="author_re" type="null"></property>
   <property name="author_xpath" type="text">//div[@id='divBookInfo']/div[@class='title']/a</property>
   <property name="catalog2cover_re" type="text">/BookReader/</property>
@@ -128,8 +129,11 @@
   <property name="chapter_url_prefix_replace_re" type="text">.*</property>
   <property name="chapter_url_prefix_replace_string" type="text">http://www.qidian.com/BookReader/</property>
   <property name="content_extract_re" type="text">document\.write\('(.*?)'\);</property>
-  <property name="content_link_prefix" type="null"></property>
-  <property name="content_link_re" type="text">'(.*\.txt)'</property>
+  <property name="content_link_code" type="text">
+        def get_content_links(html):
+          r = '(http://.*\.txt)'
+          return re.findall(r, html)
+  </property>
   <property name="content_remove_re" type="text">&lt;a.*/a&gt;</property>
   <property name="content_split_re" type="text">&lt;p&gt;</property>
   <property name="content_xpath" type="text"></property>
@@ -138,9 +142,7 @@
   <property name="identifier_catalog" type="text"></property>
   <property name="identifier_chapter" type="text">,</property>
   <property name="identifier_cover" type="text">/Book/</property>
-  <property name="img_url_list_re" type="null"></property>
-  <property name="img_url_replace_re" type="null"></property>
-  <property name="img_url_replace_string" type="null"></property>
+  <property name="image_link_code" type="null"></property>
   <property name="last_url_remove_prefix_re" type="text">/BookReader/</property>
   <property name="last_url_xpath" type="text">//*[@id='readP']/div[@class='title']/h3/a</property>
   <property name="site_coding" type="text">gbk</property>

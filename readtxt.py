@@ -621,7 +621,7 @@ def task_get_chapter(url, catalog, reload = False):
   chapter = Database.Chapter.get_or_insert(chapter_url, catalog_ref = catalog)
   
   if chapter:
-    if reload or (chapter.content_type != 'text'): # 没有文字内容，获取内容后更新书签
+    if reload or (not chapter.content_list): 
       chapter_info = BookParser.get_data(chapter_url)
       chapter.put_info(chapter_info)
     return chapter

@@ -176,7 +176,7 @@ class Catalog(db.Model):
       if url:
         chapter_url = self.chapter_url_prefix + url
         chapter = Chapter.get_by_key_name(chapter_url)
-        if (not chapter) or (chapter.content_type != 'text'):
+        if (not chapter) or (not chapter.content_list):
           chapter_list.append(chapter_url)
     return chapter_list
           
@@ -224,8 +224,7 @@ class Catalog(db.Model):
 class Chapter(db.Model):
   catalog_ref = db.ReferenceProperty(Catalog, collection_name = 'chapters', required=True)
 
-  content_type = db.TextProperty() # 章节类型(text,image,none)
-  content_list = db.ListProperty(db.Text) # 章节内容（每段为一个单位，以后为了图片列表）
+  content_list = db.ListProperty(db.Text) # 章节内容（每段为一个单位，图片为一个单位）
   chapter_title = db.TextProperty() # 章节标题，这个标题可能包含第几卷的卷名，和Catalog里面的有所不同
   
   def put_info(self, info): 
@@ -233,8 +232,6 @@ class Chapter(db.Model):
       self.content_list = [ db.Text(x) for x in info['content_list'] ]
     if info.has_key('chapter_title'): 
       self.chapter_title = info['chapter_title'] 
-    if info.has_key('content_type'):
-      self.content_type = info['content_type']
     self.put()
     
       
@@ -246,10 +243,9 @@ class Chapter(db.Model):
       }    
 
   def export_html(self):
-    if self.content_type == 'text':
-      return ''.join( [u'<p>　　'+x+'</p>' for x in self.content_list] )
-    else:
-      return ''.join( ['<img src="img/'+x+'"/><br/>' for x in self.content_list] )
+    f = lambda x : ((x.find('http://')==0 and ['<img src="img/'+x+'"/><br/>']) or [u'<p>　　'+x+'</p>'])[0]    
+    return ''.join( [f(x) for x in self.content_list] )
+
     
   def export_txt(self):
     return self.chapter_title + '\r\n' + ''.join( [u'\r\n　　'+x+'\r\n' for x in self.content_list] ) + '\r\n\r\n'

@@ -49,8 +49,7 @@ def get_item(document, html, xpath_string, re_exp):
    return get_xpath_contents(document, xpath_string)
  else:
    return get_re_first(html, re_exp)
-    
- 
+
 
 # None 和空串不放入字典
 # 注意到，如果value是空一类的值，则不要添加到字典
@@ -220,14 +219,23 @@ def parse_chapter(chapter_url, parser):
   parse_result = {} 
 
   put_into_dict(parse_result, 'chapter_title', get_xpath_string(document, parser.chapter_title_xpath))
+  
+  # 网址计算
+  # if parser.content_link_code:
+    # link_code = compile(parser.content_link_code, '<string>', 'eval')    
+    # link_function = eval(link_code)
+  # else:
+    # link_function = None
 
+  code = {} # 代码片段
+  exec 'import re' in code
+  
   # 判断获取方式
-  if parser.content_link_re:  # from link
-    content_link = get_re_first(html, parser.content_link_re) 
-    if content_link:
-      if parser.content_link_prefix:
-        content_link = parser.content_link_prefix + content_link
-      chapter_content = urlfetch.fetch( content_link, 
+  if parser.content_link_code:  # 从代码片段中获取
+    exec parser.content_link_code.strip() in code       
+    content_links = code['get_content_links'](html)
+    if content_links:
+      chapter_content = urlfetch.fetch( content_links[0], 
                                         allow_truncated=True,
                                         headers = {'Referer': chapter_url} 
                                         ).content.decode(parser.site_coding, 'ignore')
@@ -236,7 +244,8 @@ def parse_chapter(chapter_url, parser):
   else: # from xpath
     chapter_content = get_xpath_contents(document, parser.content_xpath)
  
-  if chapter_content: # 开始格式化文本    
+  # 格式化文本  
+  if chapter_content:   
     if parser.content_extract_re:
       chapter_content = get_re_first(chapter_content, parser.content_extract_re) 
    
@@ -250,20 +259,16 @@ def parse_chapter(chapter_url, parser):
       paragraph_list = [remove_re.sub('',x) for x in paragraph_list if x]
       
     paragraph_list = [x.strip() for x in paragraph_list if x.strip()] 
-
     put_into_dict(parse_result, 'content_list', paragraph_list)
-    put_into_dict(parse_result, 'content_type', 'text')
+
   
-  # 全局获取图片，如果成功，覆盖文字部分
-  if parser.img_url_list_re:
-    img_list = re.findall(parser.img_url_list_re, html)
-    
-    if img_list:
-      if parser.img_url_replace_re:
-        r_img_url_replace = re.compile(parser.img_url_replace_re)
-        img_list = [r_img_url_replace.sub(parser.img_url_replace_string, x) for x in img_list]
-      put_into_dict(parse_result, 'content_list', img_list)
-      put_into_dict(parse_result, 'content_type', 'image')
+  # 获取图片
+  if parser.image_link_code:
+    exec parser.image_link_code.strip() in code       
+    image_links = code['get_image_links'](html) 
+    if image_links:
+      put_into_dict(parse_result, 'content_list', image_links)
+
     
   return parse_result
   
