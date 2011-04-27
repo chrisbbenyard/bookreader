@@ -59,17 +59,16 @@ class Parser(db.Model):
   
   ## 章节
   chapter_title_xpath = db.TextProperty()     # 章节的标题
-  content_link_re = db.TextProperty()         # 内容链接解析(比如起点)  
-  content_link_prefix = db.TextProperty()     # 补全内容链接，有的时候和网站域名不是一个
+
+  content_link_code = db.TextProperty()       # 计算实际链接，使用字符串形式的代码，get_content_link
   content_xpath = db.TextProperty()           # 内容解析
+  
   content_extract_re = db.TextProperty()      # 进一步提取内容（提取出段落部分）
   
-  img_url_list_re = db.TextProperty()           # 主要图片分离的url
-  img_url_replace_re = db.TextProperty()        # url的处理
-  img_url_replace_string = db.TextProperty()    # .. 
+  image_link_code = db.TextProperty()         # 单独为图片解析，因为有的网站没有图片，有的网站图片在内容中，有的网站图片也是计算链接，get_image_link
     
-  content_split_re = db.TextProperty()      # 文本分段
-  content_remove_re = db.TextProperty()     # 移除
+  content_split_re = db.TextProperty()        # 文本分段
+  content_remove_re = db.TextProperty()       # 移除
   
 
 def export_parser():
