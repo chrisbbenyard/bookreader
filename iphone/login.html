@@ -2,23 +2,33 @@
   
   <head>
     <title>ReadTxT - 登录</title>
+    <meta name="viewport" content="width=device-width" />   
     <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="/iphone.css"/>
+    <script type="text/javascript">
+      if (localStorage.cookie != null) {
+        document.cookie = localStorage.cookie
+        localStorage.cookie = null
+        window.location = '/'
+      }
+    </script>
   </head>  
 
 
   <body>
+
 
   <p>
     <a href="/">首页</a>
     <a href="/help.html">帮助</a>
   </p>
   <p>
-    欢迎使用 ReadTxT，本应用的设计致力于使大家阅读互联网章回体连载通俗文学更加方便快捷。为保存您个性化的书目，首先需要登录。要了解更多，请查看<a href="/help.html">帮助</a>。
+    欢迎使用 ReadTxT，本应用的设计致力于使大家阅读互联网章回体连载通俗文学更加方便快捷。为保存您个性化的书目，首先需要登录。要了解更多，请查看<a onclick="parent.location='/help.html'">帮助</a>。
   </p>
-  
+
   <h2>登录方式一：</h2>
   <p>
-    <a href="{{ google_url }}">使用 Google 账户登录</a>
+    <a onclick="parent.location='{{ google_url }}'" >使用 Google 账户登录</a>
   </p>
   <p>
     <small>

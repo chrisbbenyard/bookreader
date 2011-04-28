@@ -1,0 +1,59 @@
+﻿<html>  
+  <head>
+    <title>ReadTxT - 网络小说一站式阅读</title>
+    <meta name="viewport" content="width=device-width"/> 
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <link rel="apple-touch-icon-precomposed" href="/retina-icon.png"/>   
+    <link rel="apple-touch-startup-image" href="/startup.png"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <link rel="shortcut icon" href="/favicon.ico"/>
+    <link rel="stylesheet" href="/iphone.css"/>
+    <script type="text/javascript"> 
+      localStorage.cookie = document.cookie 
+    </script>
+  </head>    
+  <body>
+  
+    <div id="header"> 
+			<div id="logo">ReadTxT</div><div id="signedin"><a href='/user'>{{ nickname }}</a></div> 
+		</div>     
+
+    {% if not bookmarks %}
+      <p>
+        您的书签列表为空，点击“<a href="/bookmarks">书签管理</a>”添加。
+      </p>
+      <p>
+        <a href="/help.html#guide">快速浏览功能介绍？</a>
+      </p>
+    {% endif %}   
+    
+
+    
+    <div id='bookmarks'> 
+      {% for book in bookmarks %}  
+      <div>
+        <a onclick="parent.location='{{ book.read_link }}'" class="bookmark">
+          <div class="title">
+            <b>{{ book.title }}</b>
+            {% if book.author %}
+              - {{ book.author }}
+            {% endif %} 
+          </div>
+          <div class="info">           
+                {% if book.chapter_title %}
+                  {{ book.chapter_title }}
+                {% else %}
+                  未获取章节名
+                {% endif %}         
+          </div>
+          <div class="info">                
+              {% if book.update_date %}
+                {{ book.update_date }}
+              {% endif %}        
+          </div>
+        </a>
+      </div>
+      {% endfor %} 
+    </div>
+  </body>
+</html>

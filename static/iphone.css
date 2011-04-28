@@ -1,0 +1,325 @@
+*
+{
+	background: transparent;
+	border: 0;
+	margin: 0;
+	outline: 0;
+	padding: 0;
+	vertical-align: baseline;
+}
+blockquote,q
+{
+	quotes: none;
+}
+input,textarea
+{
+	margin: 0;
+	padding: 0;
+}
+:focus
+{
+	outline: 0;
+}
+ins
+{
+	text-decoration: none;
+}
+del
+{
+	text-decoration: line-through;
+}
+table
+{
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+body
+{
+	background-color: #000!important;
+	color: #FFF;
+	font: 16px/1.5 Verdana,Arial,"华文黑体";
+	webkit-text-size-adjust: none;
+}
+img
+{
+	max-width: 100%;
+}
+
+#header
+{
+	margin: 0px;
+	overflow: hidden;
+  background-color: #444444;
+}
+#logo
+{
+  margin-left: 2px;
+	float: left;  
+	overflow: hidden;
+}
+#signedin
+{
+  margin-right: 2px;
+	float: right;
+}
+
+#toolbar
+{
+	margin: 0px;
+	overflow: hidden;
+  background-color: #222222;
+}
+#toolbar_main
+{
+}
+#toolbar_main li
+{
+	float: left;
+	text-align: center;
+	width: 25%;
+  margin: 0px;
+}
+#toolbar_main li a
+{
+	display: block;
+	padding: 6px 0 7px;
+}
+#toolbar_main li.selected a
+{
+	color: #000;
+	padding-top: 7px;
+}
+
+#out
+{
+	background-color: #1a1a1a;
+	min-height: 100%;
+	overflow: hidden;
+	position: relative;
+	word-wrap: break-word;
+}
+#inner
+{
+	padding-bottom: 54px;
+}
+
+#hd
+{
+	background-color: #000;
+	padding: 5px 0;
+	position: relative;
+	text-align: center;
+}
+#hd h1
+{
+	height: 48px;
+}
+#hd h2
+{
+	padding: 10px 0;
+}
+#hd h2 a
+{
+	color: #fff;
+	text-decoration: none;
+}
+#lg a
+{
+	text-decoration: none;
+}
+#lg a:hover
+{
+	color: #fff;
+}
+a,#cts a:hover
+{
+	color: #46b40a;
+}
+
+.bookmark
+{
+
+}
+.bookmark p
+{
+
+}
+a.bookmark
+{
+	background-color: #1a1a1a;
+	border-bottom: solid 1px #444;
+	color: #FFF!important;
+	display: block;
+	line-height: 1.2;
+	overflow: hidden;
+	padding: 7px 10px;
+	text-decoration: none;
+}
+a.bookmark:hover, a.bookmark:active
+{
+	background-color: #46b40a;
+}
+.bookmark .title
+{
+	font-size: 24px;
+}
+.bookmark .info
+{
+	color: #ddd;
+	font-size: 13px;
+	padding: 2px 2px 2px 5px;
+ 
+}
+
+
+
+.bookmark a,.commentlist a,.login a
+{
+	color: #46b40a!important;
+}
+.bookmark ul,.bookmark ol
+{
+	margin-bottom: 26px;
+}
+.postmetadata
+{
+	padding: 10px 0 0;
+}
+.comments
+{
+	background: #000;
+	border-top: 1px solid #444;
+	height: 60px;
+}
+#cmnts
+{
+	line-height: 60px;
+	text-align: center;
+}
+.commentlist
+{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	word-wrap: break-word;
+}
+.comment
+{
+	border-top: 1px solid #444;
+	padding: 10px;
+}
+.comment-info
+{
+	padding: 0 0 10px;
+}
+#comment
+{
+	border: 0;
+	border-radius: 8px;
+	font-size: 16px;
+	margin-bottom: 10px;
+	moz-border-radius: 8px;
+	padding: 10px 1%;
+	webkit-border-radius: 8px;
+	width: 98%;
+}
+.outbl
+{
+	border-radius: 8px;
+	margin-bottom: 10px;
+	moz-border-radius: 8px;
+	padding: 10px;
+	webkit-border-radius: 8px;
+}
+.outbl.sbm
+{
+	background-color: #46b40a;
+}
+.submit
+{
+	margin-top: 10px;
+}
+#submit
+{
+	background: none;
+	border: 0;
+	color: #FFF;
+	cursor: pointer;
+	font-size: 16px;
+	font-weight: bold;
+	width: 100%;
+}
+#respond
+{
+	border-top: 1px solid #444;
+	padding: 7px 10px;
+}
+#uit p
+{
+	padding: 5px;
+}
+.wp-pagenavi
+{
+	background-color: #1a1a1a;
+	border-bottom: 1px solid #444;
+	font-size: 16px;
+	font-weight: bold;
+	height: 60px;
+	line-height: 60px;
+	padding: 0 10px;
+	text-align: center;
+}
+.wp-pagenavi a
+{
+	color: #FFF;
+	line-height: 60px;
+	margin: 0 5px;
+	padding: 15px 5px;
+	text-decoration: none!important;
+}
+.current
+{
+	background-color: #46b40a;
+	border-radius: 8px;
+	line-height: 25px;
+	margin: 0 5px;
+	moz-border-radius: 8px;
+	padding: 5px 10px;
+	webkit-border-radius: 8px;
+}
+a.nextpage
+{
+	background-color: #46b40a;
+	border-radius: 8px;
+	font-size: 24px;
+	margin: 0 5px;
+	moz-border-radius: 8px;
+	padding: 5px 10px;
+	text-decoration: none;
+	webkit-border-radius: 8px;
+}
+a.nextpage:hover
+{
+	background-color: #fff;
+	color: #46b40a;
+}
+#ftr
+{
+	background-color: #000;
+	bottom: 0;
+	font-size: 13px;
+	height: 40px;
+	line-height: 40px;
+	padding: 7px 0;
+	position: absolute;
+	width: 100%;
+}
+#ftr .cp
+{
+	padding-left: 10px;
+}
+#ftr .md
+{
+	float: right;
+	padding-right: 10px;
+}
