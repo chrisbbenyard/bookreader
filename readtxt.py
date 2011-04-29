@@ -134,8 +134,8 @@ class UserInfo(webapp.RequestHandler):
       'book_number': len(user.get_user_book_keys()),
       'logout_url': user_info['logout_url'], 
       }
-
-    path = os.path.join(os.path.dirname(__file__), 'template/user.html')
+    device_info = get_device_info(self.request)
+    path = os.path.join(os.path.dirname(__file__), device_info['template'] + 'user.html')
     self.response.out.write(template.render(path, template_values))    
   
   def post(self):

@@ -6,9 +6,9 @@
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="stylesheet" href="/iphone.css"/>
     <script type="text/javascript">
-      if (localStorage.cookie != null) {
-        document.cookie = localStorage.cookie
-        localStorage.cookie = null
+      if (sessionStorage.visited == null) {
+        document.cookie = localStorage.cookie        
+        sessionStorage.visited = 'yes'
         window.location = '/'
       }
     </script>

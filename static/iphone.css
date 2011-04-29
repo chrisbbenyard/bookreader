@@ -1,4 +1,4 @@
-*
+body
 {
 	background: transparent;
 	border: 0;
@@ -136,14 +136,6 @@ a,#cts a:hover
 	color: #46b40a;
 }
 
-.bookmark
-{
-
-}
-.bookmark p
-{
-
-}
 a.bookmark
 {
 	background-color: #1a1a1a;
@@ -154,6 +146,7 @@ a.bookmark
 	overflow: hidden;
 	padding: 7px 10px;
 	text-decoration: none;
+  background: url(/arrow-right.png) 98% 50% no-repeat;
 }
 a.bookmark:hover, a.bookmark:active
 {
