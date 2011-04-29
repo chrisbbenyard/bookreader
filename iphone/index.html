@@ -12,10 +12,9 @@
       localStorage.cookie = document.cookie 
     </script>
   </head>    
-  <body>
-  
+  <body>  
     <div id="header"> 
-			<div id="logo">ReadTxT</div><div id="signedin"><a href='/user'>{{ nickname }}</a></div> 
+			<div id="logo">ReadTxT</div><div id="signedin"><a onclick="parent.location='/user'">{{ nickname }}</a></div> 
 		</div>     
 
     {% if not bookmarks %}
@@ -31,7 +30,7 @@
     
     <div id='bookmarks'> 
       {% for book in bookmarks %}  
-      <div>
+      <div class="item">
         <a onclick="parent.location='{{ book.read_link }}'" class="bookmark">
           <div class="title">
             <b>{{ book.title }}</b>
@@ -47,6 +46,9 @@
                 {% endif %}         
           </div>
           <div class="info">                
+              {% if book.unread_number %}
+                {{ book.unread_number }}章未读
+              {% endif %} 
               {% if book.update_date %}
                 {{ book.update_date }}
               {% endif %}        
