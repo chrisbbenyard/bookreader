@@ -4,47 +4,45 @@
     <meta name="viewport" content="width=device-width" />   
     <link rel="shortcut icon" href="/favicon.ico" />   
     <link rel="stylesheet" href="/iphone.css"/>
-  </head> 
-
-  <script src="/iphone.js" type="text/javascript" language="javascript" />
-    
+    <script src="/iphone_read.js" type="text/javascript" language="javascript" />
+  </head>       
   <body>
-  
-  <p>
-    <a href="/">首页</a>
-    <a href="{{ book.update_link }}">更新</a>
-    <a href="{{ book.catalog_link }}">目录</a>
-  </p>
-
-  <p><b>{{ book.title }}</b> - {{ chapter.chapter_title}}</p>
-  
-  <p>
-    {% if book.prev_link %}
-      <a href="{{ book.prev_link }}">上章</a> 
-    {% else %}
-      上章
-    {% endif %}
-    {% if book.next_link %}
-      <a href="{{ book.next_link }}">下章</a> 
-    {% else %}
-      下章
-    {% endif %}
-  </p>
-  <div id='content_box'>
-    {{ content }}
-  </div>
-  <p>
-    <a href="/">首页</a>
-    {% if book.prev_link %}
-      <a href="{{ book.prev_link }}">上章</a> 
-    {% else %}
-      上章
-    {% endif %}
-    {% if book.next_link %}
-      <a href="{{ book.next_link }}">下章</a> 
-    {% else %}
-      下章
-    {% endif %}
-  </p>
+    <div id="header"> 
+			<div class="left"><a onclick="window.location='/'">首页</a></div>
+      <div class="right">
+        <a onclick="window.location='{{ book.catalog_link }}'">目录</a>
+        <a onclick="window.location='{{ book.update_link }}'">书签</a>      
+        <a onclick="window.location='/help'">帮助</a>
+      </div>       
+		</div>       
+    <p><b>{{ book.title }}</b> - {{ chapter.chapter_title}}</p>    
+    <p>
+      {% if book.prev_link %}
+        <a onclick="window.location='{{ book.prev_link }}'">上章</a>
+      {% else %}
+        上章
+      {% endif %} |
+      {% if book.next_link %}
+        <a onclick="window.location='{{ book.next_link }}'">下章</a> 
+      {% else %}
+        下章
+      {% endif %}
+    </p>
+    <div id='content_box'>
+      {{ content }}
+    </div>
+    <p>
+      <a onclick="window.location='/'">首页</a> |
+      {% if book.prev_link %}
+        <a onclick="window.location='{{ book.prev_link }}'">上章</a>
+      {% else %}
+        上章
+      {% endif %} |
+      {% if book.next_link %}
+        <a onclick="window.location='{{ book.next_link }}'">下章</a> 
+      {% else %}
+        下章
+      {% endif %}
+    </p>
   </body>
 </html>

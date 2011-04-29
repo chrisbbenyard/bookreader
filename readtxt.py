@@ -320,7 +320,8 @@ class BookmarkCatalog(webapp.RequestHandler):
       'book': bookmark.get_info(),
       'chapter_list': catalog.get_info()['chapter_list'],        
       }
-    path = os.path.join(os.path.dirname(__file__), 'template/catalog.html')
+    device_info = get_device_info(self.request)        
+    path = os.path.join(os.path.dirname(__file__), device_info['template'] + 'catalog.html')
     self.response.out.write(template.render(path, template_values))
 
       
@@ -468,8 +469,8 @@ class Help(webapp.RequestHandler):
     template_values = {
       'parser_info': parser_info,      
       }
-
-    path = os.path.join(os.path.dirname(__file__), 'template/help.html')
+    device_info = get_device_info(self.request)    
+    path = os.path.join(os.path.dirname(__file__), device_info['template'] + 'help.html')
     self.response.out.write(template.render(path, template_values))   
 
    
@@ -779,7 +780,7 @@ application = webapp.WSGIApplication(
                                       (r'/cron/(.*)', Schedule),
                                       (r'/atom/(.*).xml', Atom), # 因为Google Reader不接受Feed以html结尾
                                       
-                                      ('/help.html', Help),
+                                      ('/help', Help),
                                       ],
                                      debug=True)
 
