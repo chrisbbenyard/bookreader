@@ -1,61 +1,75 @@
 ﻿<html>  
   <head>
     <title>ReadTxT - 网络小说一站式阅读</title>
-    <meta name="viewport" content="width=device-width"/> 
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
-    <link rel="apple-touch-icon-precomposed" href="/retina-icon.png"/>   
-    <link rel="apple-touch-startup-image" href="/startup.png"/>
+    <meta name="viewport" content="width=device-width" /> 
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    <link rel="shortcut icon" href="/favicon.ico"/>
-    <link rel="stylesheet" href="/iphone.css"/>
+    <link rel="apple-touch-icon-precomposed" href="/retina-icon.png" />   
+    <link rel="apple-touch-startup-image" href="/startup.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="/iphone.css" />
     <script type="text/javascript"> 
       localStorage.cookie = document.cookie 
     </script>
   </head>    
   <body>  
     <div id="header"> 
-			<div id="logo">ReadTxT</div><div id="signedin"><a onclick="parent.location='/user'">{{ nickname }}</a></div> 
+			<div class="left">ReadTxT</div>
+      <div class="right">{{ nickname }}
+        <a onclick="window.location='/user'">账户</a>
+        <a onclick="window.location='/help'">帮助</a>
+        <a onclick="localStorage.cookie = null;window.location='{{ logout_url }}'">登出</a>
+      </div>       
 		</div>     
 
     {% if not bookmarks %}
       <p>
-        您的书签列表为空，点击“<a href="/bookmarks">书签管理</a>”添加。
+        您的书签列表为空，点击“<a onclick="window.location='/bookmarks'">书签管理</a>”添加。
       </p>
       <p>
-        <a href="/help.html#guide">快速浏览功能介绍？</a>
+        <a onclick="window.location='/help#guide'">快速浏览功能介绍？</a>
       </p>
     {% endif %}   
     
 
     
-    <div id='bookmarks'> 
+    <div id="bookmark_list"> 
       {% for book in bookmarks %}  
-      <div class="item">
-        <a onclick="parent.location='{{ book.read_link }}'" class="bookmark">
+      <div class="item">        
           <div class="title">
             <b>{{ book.title }}</b>
             {% if book.author %}
               - {{ book.author }}
             {% endif %} 
           </div>
-          <div class="info">           
-                {% if book.chapter_title %}
-                  {{ book.chapter_title }}
-                {% else %}
-                  未获取章节名
-                {% endif %}         
+          <div class="chapter">           
+            {% if book.chapter_title %}
+              <a onclick="window.location='{{ book.read_link }}'">{{ book.chapter_title }}</a>
+            {% else %}
+              未获取章节名
+            {% endif %}         
           </div>
-          <div class="info">                
-              {% if book.unread_number %}
-                {{ book.unread_number }}章未读
-              {% endif %} 
-              {% if book.update_date %}
-                {{ book.update_date }}
-              {% endif %}        
+          <div class="info">              
+            {% if book.update_date %}
+              更新: {{ book.update_date }}
+            {% endif %}        
           </div>
-        </a>
+          <div class="info" style="float:left">            
+            未读: {{ book.unread_number }}章
+          </div>
+          <div class="info" style="float:right">  
+            {% if book.next_link %}
+              <a onclick="window.location='{{ book.next_link }}'">下章</a> |
+            {% endif %}          
+            <a onclick="window.location='{{ book.catalog_link }}'">目录</a> |
+            <a onclick="window.location='{{ book.update_link }}'">书签</a>
+          </div>
       </div>
       {% endfor %} 
     </div>
+    <p align="center">
+      <a onclick="window.location='/quickupdate'" class="button">全部更新</a>
+    </p>
   </body>
 </html>

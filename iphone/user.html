@@ -1,6 +1,6 @@
 ﻿<html>
-  <head>
-    <title>ReadTxT - 用户信息</title>
+  <head>    
+    <title>ReadTxT - 信息管理</title>
     <meta name="viewport" content="width=device-width" />   
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="stylesheet" href="/iphone.css"/>
@@ -11,10 +11,10 @@
    
   <body>  
   <p>
-    <a href="/">首页</a>    
-    <a href="/bookmarks">书签管理</a>
+    <a onclick="window.location='/'">首页</a>    
+    <a onclick="window.location='/bookmarks'">书签管理</a>
     <a href="{{ logout_url }}">更换用户</a>
-    <a href="/help.html">帮助</a>
+    <a href="/help">帮助</a>
   </p>
 
   <table>      
@@ -33,5 +33,17 @@
     <input type="text" id="nickname" name="nickname" value="{{ nickname }}"style="width:150"><br />
     <input type="submit" value="更改">
   </form>
+  
+  <p>-----</p>
+  <form action="/addbook/" method="post">   
+    地址：<br/>
+    <input type="text" id="chapter_url" name="chapter_url" style="width:250">
+    <input type="submit" value="加入新书"><br/>
+    </table>    
+  </form>
+  <p>-----</p>
+  <p>
+    <a onclick="window.location='/help#support'">目前支持的网站</a>
+  </p>   
   </body>
 </html>
