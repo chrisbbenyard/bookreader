@@ -9,6 +9,8 @@
     <link rel="apple-touch-startup-image" href="/startup.png" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="stylesheet" href="/iphone.css" />
+    <link rel="stylesheet" href="/iphone_mode.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js" type="text/javascript" language="javascript" />    
     <script type="text/javascript"> 
       localStorage.cookie = document.cookie 
     </script>
@@ -71,5 +73,11 @@
     <p align="center">
       <a onclick="window.location='/quickupdate'" class="button">全部更新</a>
     </p>
+    
+    <div id="appModeNote">
+      <em>试试全屏模式吧!</em>
+      <span>使用“添加至主屏幕”获得更好的体验！ </span>
+    </div>
+    <script src="/iphone_mode.js" type="text/javascript" language="javascript" />
   </body>
 </html>
