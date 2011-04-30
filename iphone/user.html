@@ -9,41 +9,39 @@
     </script>
    </head>  
    
-  <body>  
-  <p>
-    <a onclick="window.location='/'">首页</a>    
-    <a onclick="window.location='/bookmarks'">书签管理</a>
-    <a href="{{ logout_url }}">更换用户</a>
-    <a href="/help">帮助</a>
-  </p>
-
-  <table>      
-    <tr>
-      <td colspan="2"><b>{{ nickname }}</b>
-    </tr>    
-    <tr>
-      <td>状态:</td>
-      <td>{{ book_number }} 本书, {{ bookmark_number }} 个书签</td>
-    </tr>      
-	</table>
-  
-  <p>-----</p>
-  <form method="post" action="/user">
-    昵称：<br/>
-    <input type="text" id="nickname" name="nickname" value="{{ nickname }}"style="width:150"><br />
-    <input type="submit" value="更改">
-  </form>
-  
-  <p>-----</p>
-  <form action="/addbook/" method="post">   
-    地址：<br/>
-    <input type="text" id="chapter_url" name="chapter_url" style="width:250">
-    <input type="submit" value="加入新书"><br/>
-    </table>    
-  </form>
-  <p>-----</p>
-  <p>
-    <a onclick="window.location='/help#support'">目前支持的网站</a>
-  </p>   
+  <body>    
+    <div id="header"> 
+			<div class="left"><a onclick="window.location='/'">首页</a></div>
+      <div class="right">        
+        <a onclick="window.location='/help'">帮助</a>
+        <a onclick="localStorage.cookie = null;window.location='{{ logout_url }}'">登出</a>
+      </div>       
+		</div>   
+    <table>      
+      <tr>
+        <td colspan="2"><b>{{ nickname }}</b>
+      </tr>    
+      <tr>
+        <td>状态:</td>
+        <td>{{ book_number }} 本书, {{ bookmark_number }} 个书签</td>
+      </tr>      
+    </table>   
+    <p>-----</p>
+    <form method="post" action="/user">
+      昵称：<br/>
+      <input type="text" id="nickname" name="nickname" value="{{ nickname }}"style="width:50%">
+      <input type="submit" value="更改">
+    </form>    
+    <p>-----</p>
+    <form action="/addbook/" method="post">   
+      地址：<br/>
+      <input type="text" id="chapter_url" name="chapter_url" style="width:70%">
+      <input type="submit" value="加入新书"><br/>
+      </table>    
+    </form>
+    <p>-----</p>
+    <p>
+      <a onclick="window.location='/help#support'">目前支持的网站</a>
+    </p>   
   </body>
 </html>

@@ -16,7 +16,7 @@ img
 }
 a
 {
-	color: #99ff99;
+	color: #99ff99;  
 }
 
 #header
@@ -64,6 +64,7 @@ a
 .button
 {
 	background-color: #46b40a;
+  color: #FFF;
 	border-radius: 8px;
 	font-size: 24px;
 	margin: 5px;
@@ -71,9 +72,7 @@ a
 	padding: 5px;
 	text-decoration: none;
 	webkit-border-radius: 8px;
-  color: #FFF;
 }
-
 a.button:hover
 {
 	background-color: #fff;
