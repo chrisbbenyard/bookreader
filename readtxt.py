@@ -19,7 +19,17 @@ import BookParser
 import Database
 import Parser
 
-
+def get_device_info(req):
+  ua = req.headers['User-Agent']
+  device_info = {}
+  if ua.find('iPhone') != -1:
+    device_info['device'] = 'iphone'
+    device_info['template'] = 'iphone/'    
+  else:
+    device_info['device'] = 'desktop'
+    device_info['template'] = 'template/'
+  return device_info
+  
   
 def get_user_info(req):
   google_user = users.get_current_user()
@@ -37,16 +47,13 @@ def get_user_info(req):
     
   user_info = {}
 
-  if google_user:
-    #user_info['type'] = 'google'    
+  if google_user:   
     user_info['username'] = google_user.email()
     user_info['logout_url'] = users.create_logout_url(req.uri) 
-  elif task_user:
-    #user_info['type'] = 'task'    
+  elif task_user:    
     user_info['username'] = task_user
     user_info['logout_url'] = None
-  elif user_key:
-    #user_info['type'] = 'key'    
+  elif user_key: 
     user_info['username'] = user_key
     user_info['logout_url'] = '/logout'
   else:
@@ -58,7 +65,7 @@ def get_user_info(req):
       'key:' + user_info['username'], 
       nickname = user_info['username'][:user_info['username'].find('@')],
       )
-
+      
   return user_info
     
    
@@ -69,8 +76,8 @@ class Login(webapp.RequestHandler):
     template_values = {
       'google_url': google_url,
       }
-
-    path = os.path.join(os.path.dirname(__file__), 'template/login.html')
+    device_info = get_device_info(self.request)
+    path = os.path.join(os.path.dirname(__file__), device_info['template'] + 'login.html')
     self.response.out.write(template.render(path, template_values)) 
     
   def post(self):   # 用户使用User Key登录
@@ -91,10 +98,11 @@ class Logout(webapp.RequestHandler): # User Key注销
     
 class MainPage(webapp.RequestHandler):
   def get(self):
-    user_info = get_user_info(self.request)
+    user_info = get_user_info(self.request)   
+    
     if user_info == None: 
       self.redirect('/login') 
-      return
+      return   
     
     user = user_info['user']    
     # datetime使用str是为了包括和None比较的情况
@@ -106,8 +114,8 @@ class MainPage(webapp.RequestHandler):
       'logout_url': user_info['logout_url'], 
       'nickname': user.nickname,
       }
-
-    path = os.path.join(os.path.dirname(__file__), 'template/index.html')
+    device_info = get_device_info(self.request)
+    path = os.path.join(os.path.dirname(__file__), device_info['template'] + 'index.html')
     self.response.out.write(template.render(path, template_values))
 
 # 用户信息
@@ -126,8 +134,8 @@ class UserInfo(webapp.RequestHandler):
       'book_number': len(user.get_user_book_keys()),
       'logout_url': user_info['logout_url'], 
       }
-
-    path = os.path.join(os.path.dirname(__file__), 'template/user.html')
+    device_info = get_device_info(self.request)
+    path = os.path.join(os.path.dirname(__file__), device_info['template'] + 'user.html')
     self.response.out.write(template.render(path, template_values))    
   
   def post(self):
@@ -221,7 +229,9 @@ class ReadChapter(webapp.RequestHandler):
       'content': chapter.export_html(),
       'book': bookmark.get_info(),
       }
-    path = os.path.join(os.path.dirname(__file__), 'template/read.html')
+      
+    device_info = get_device_info(self.request)
+    path = os.path.join(os.path.dirname(__file__), device_info['template'] + 'read.html')
     self.response.out.write(template.render(path, template_values))
  
  
@@ -310,7 +320,8 @@ class BookmarkCatalog(webapp.RequestHandler):
       'book': bookmark.get_info(),
       'chapter_list': catalog.get_info()['chapter_list'],        
       }
-    path = os.path.join(os.path.dirname(__file__), 'template/catalog.html')
+    device_info = get_device_info(self.request)        
+    path = os.path.join(os.path.dirname(__file__), device_info['template'] + 'catalog.html')
     self.response.out.write(template.render(path, template_values))
 
       
@@ -458,8 +469,8 @@ class Help(webapp.RequestHandler):
     template_values = {
       'parser_info': parser_info,      
       }
-
-    path = os.path.join(os.path.dirname(__file__), 'template/help.html')
+    device_info = get_device_info(self.request)    
+    path = os.path.join(os.path.dirname(__file__), device_info['template'] + 'help.html')
     self.response.out.write(template.render(path, template_values))   
 
    
@@ -496,7 +507,8 @@ class UpdateBook(webapp.RequestHandler):
           'book': bookmark_info,  
           'catalog': catalog_info,
           }
-        path = os.path.join(os.path.dirname(__file__), 'template/update.html')
+        device_info = get_device_info(self.request)
+        path = os.path.join(os.path.dirname(__file__), device_info['template'] + 'update.html')
         self.response.out.write(template.render(path, template_values))
       
       elif op == 'manual': # 手动更新          
@@ -769,7 +781,7 @@ application = webapp.WSGIApplication(
                                       (r'/cron/(.*)', Schedule),
                                       (r'/atom/(.*).xml', Atom), # 因为Google Reader不接受Feed以html结尾
                                       
-                                      ('/help.html', Help),
+                                      ('/help', Help),
                                       ],
                                      debug=True)
 

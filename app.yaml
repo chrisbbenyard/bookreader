@@ -51,7 +51,7 @@ handlers:
   script: readtxt.py
   
 # help
-- url: /help.html
+- url: /help
   script: readtxt.py
 
 
