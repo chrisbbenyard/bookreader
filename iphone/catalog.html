@@ -1,0 +1,33 @@
+﻿<html>  
+  <head>
+    <title>{{ book.title }}</title>
+    <meta name="viewport" content="width=device-width" />   
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="/iphone.css"/>    
+  </head>   
+  <body> 
+    <div id="header"> 
+			<div class="left"><a onclick="window.location='/'">首页</a></div>
+      <div class="right">
+        <a onclick="window.location='{{ book.update_link }}'">书签</a>      
+        <a onclick="window.location='/help'">帮助</a>
+      </div>       
+		</div>  
+    <p>
+      <b>{{ book.title }}</b>          
+      {% if book.author %}
+        - {{ book.author }}
+      {% endif %} 
+    </p> 	
+    <p>      
+      {% for chapter in chapter_list %}
+        {% if chapter.url %}
+          <a onclick="window.location='{{ book.select_link }}{{ chapter.url }}'">{{ chapter.title }}</a><br/> 
+        {% else %}
+          {{ chapter.title }}<br/> 
+        {% endif %}
+      {% endfor %}
+    </p>
+
+  </body>
+</html>

@@ -149,7 +149,7 @@ class Catalog(db.Model):
         return self.chapter_url_list[prev_index]
       prev_index = prev_index - 1
     return None       
-   
+
   def find_first_chapter_index(self):
     i = 0
     while i < len(self.chapter_url_list):
@@ -165,6 +165,9 @@ class Catalog(db.Model):
         return i
       i = i - 1
     return None
+    
+  def get_unread_chapter_number(self, curr_index):
+    return len( [x for x in self.chapter_url_list[curr_index : ] if x] ) - 1
     
   def get_chapter_number(self):
     chapter_list = [x for x in self.chapter_url_list if x] # 非空串就是实际的章节，空串是分卷名
@@ -284,6 +287,7 @@ class Bookmark(db.Model):
   chapter_title = db.TextProperty()  
   next_url = db.TextProperty()
   prev_url = db.TextProperty()
+  unread_number = db.IntegerProperty()
   #curr_index = db.IntegerProperty()
   
     
@@ -323,6 +327,7 @@ class Bookmark(db.Model):
         self.chapter_title = catalog.chapter_title_list[curr_index]
         self.next_url = catalog.find_next_chapter(curr_index)
         self.prev_url = catalog.find_prev_chapter(curr_index)
+        self.unread_number = catalog.get_unread_chapter_number(curr_index)
         
       except: # 非法当前章节（至少现在的目录里面没有）
         print 'Error'
@@ -348,6 +353,7 @@ class Bookmark(db.Model):
       'curr_url': self.curr_url,
       'next_url': self.next_url,
       'prev_url': self.prev_url, 
+      'unread_number' : self.unread_number,
       'cover_url': self.cover_url,
       'catalog_url': self.catalog_url,      
       'add_date': self.add_date + datetime.timedelta(hours=time_delta),

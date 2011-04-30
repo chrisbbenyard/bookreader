@@ -1,0 +1,32 @@
+#appModeNote {
+  background-color: #333333 ;
+  border-top: 5px solid #000000 ;
+  bottom: 0px ;
+  color: #F0F0F0 ;
+  display: none ;
+  font-family: helvetica ;
+  left: 0px ;
+  padding: 10px 0px 10px 0px ;
+  position: fixed ;
+  text-align: center ;
+  width: 100% ;
+}
+ 
+
+#appModeNote em {
+  display: block ;
+  font-size: 20px ;
+  font-weight: bold ;
+  line-height: 26px ;
+}
+ 
+
+#appModeNote span {
+  display: block ;
+  font-size: 14px ;
+  line-height: 20px ;
+}
+ 
+
+</style>
+
