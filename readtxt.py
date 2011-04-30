@@ -507,7 +507,8 @@ class UpdateBook(webapp.RequestHandler):
           'book': bookmark_info,  
           'catalog': catalog_info,
           }
-        path = os.path.join(os.path.dirname(__file__), 'template/update.html')
+        device_info = get_device_info(self.request)
+        path = os.path.join(os.path.dirname(__file__), device_info['template'] + 'update.html')
         self.response.out.write(template.render(path, template_values))
       
       elif op == 'manual': # 手动更新          
