@@ -1,5 +1,4 @@
-body
-{
+body{
 	background: transparent;
   background-color: #000;
   color: #FFF;
@@ -10,15 +9,15 @@ body
 	padding: 0;
 	vertical-align: baseline;
 }
-img
-{
+img{
 	max-width: 100%;
 }
-a
-{
+a{
 	color: #99ff99;  
 }
-
+* {
+  -webkit-tap-highlight-color: #ccc;
+}
 #header
 {
 	margin: 0px;
