@@ -494,7 +494,7 @@ class UpdateBook(webapp.RequestHandler):
         catalog_info = {}
         last_index = catalog.find_last_chapter_index()
         if last_index != None:
-          catalog_info['last_url'] = catalog.chapter_url_prefix + catalog.chapter_url_list[last_index]
+          catalog_info['last_url'] = catalog.chapter_url_list[last_index]
           catalog_info['last_title'] = catalog.chapter_title_list[last_index]
         catalog_info['chapter_number'] = catalog.get_chapter_number()
         catalog_info['not_download_number'] = len(catalog.get_not_downloaded_chapter_list())

@@ -20,12 +20,16 @@
 	
   <table> 
       <tr>
+        <td>书页:</td>
+        <td><a href="{{ book.cover_url }}">{{ book.site }} - {{ book.title}}</a></td>
+      </tr>  
+      <tr>
         <td>当前:</td>
         <td>{{ book.chapter_title }}</td>
       </tr>
       <tr>
         <td>最新:</td>
-        <td><a href="{{ catalog.last_url }}">{{ catalog.last_title }}</a></td>
+        <td><a onclick="window.location='{{ book.select_link }}{{ catalog.last_url }}'">{{ catalog.last_title }}</a></td>
       </tr>
       <tr>
         <td>更新:</td>
