@@ -16,15 +16,19 @@
 	
   <table> 
       <tr>
-        <td>当前章节:</td>
+        <td>书页:</td>
+        <td><a href="{{ book.cover_url }}">{{ book.site }} - {{ book.title}}</a></td>
+      </tr>  
+      <tr>
+        <td>当前:</td>
         <td>{{ book.chapter_title }}</td>
       </tr>
       <tr>
-        <td>最新章节:</td>
-        <td><a href="{{ catalog.last_url }}">{{ catalog.last_title }}</a></td>
+        <td>最新:</td>
+        <td><a href="{{ book.select_link }}{{ catalog.last_url }}">{{ catalog.last_title }}</a></td>
       </tr>
       <tr>
-        <td>网站更新:</td>
+        <td>更新:</td>
         <td>              
           {% if book.update_date %}
             {{ book.update_date }}
@@ -34,11 +38,11 @@
         </td>          
       </tr>
       <tr>
-        <td>章节总数:</td>
-        <td>{{ catalog.chapter_number }} 章 (有 {{ catalog.not_download_number }} 章未获取)</td>
+        <td>章节:</td>
+        <td>共 {{ catalog.chapter_number }} 章 (有 {{ catalog.not_download_number }} 章未获取)</td>
       </tr>
       <tr>
-        <td>上次刷新:</td>
+        <td>刷新:</td>
         <td>{{ catalog.last_check_date }}</td>      
       </tr>
 	</table>
