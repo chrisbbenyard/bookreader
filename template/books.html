@@ -3,18 +3,14 @@
     <title>ReadTxT - 书籍管理</title>
     <meta name="viewport" content="width=device-width" />   
     <link rel="shortcut icon" href="/favicon.ico" />
-   </head>  
-  
-  
-  <body>
-  
+   </head>    
+  <body> 
     <p>
       <a href="/">首页</a>
       <a href="/export">导出书签</a>
       <a href="/import">批量加入</a>
       <a href="/help.html">帮助</a>
-    </p>
- 
+    </p> 
     {% for book in booklist %}      
       <b>{{ book.title }}</b> - {{ book.author }} 
       <a href="{{ book.delete_link }}">删除本书</a>

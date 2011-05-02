@@ -3,16 +3,13 @@
     <title>ReadTxT - 用户管理</title>
     <meta name="viewport" content="width=device-width" />   
     <link rel="shortcut icon" href="/favicon.ico" />
-  </head>  
-  
+  </head>    
   <body>
     <p>
       <a href="/admin ">管理员首页</a>
       <a href="/admin/users">用户管理</a>
       <a href='/admin/books'>书籍管理</a>      
     </p>
-    
-
     <table>
       {% for user in all_users %}      
         <tr>
@@ -23,10 +20,6 @@
         </tr>
         <tr style="height:1em;"></tr>
       {% endfor %}
-    </table>
-
-  
-
-    
+    </table>   
   </body>
 </html>
