@@ -5,13 +5,11 @@
     <link rel="shortcut icon" href="/favicon.ico" />   
   </head> 
 
-  <script type="text/javascript" language="javascript">
-  
+  <script type="text/javascript" language="javascript">  
     window.addEventListener('load', function() {
       var b = document.getElementById('content_box');    
       b.addEventListener('touchstart', scrollPage, false);      
-    }, false);
-    
+    }, false); 
 
     
     function scrollPage(event) {       
@@ -27,24 +25,18 @@
       }
       else {
         return;
-      }
-      
+      }      
       event.preventDefault();
-    }    
+    }      
+  </script> 
   
-  </script>
-  
-  
-  <body>
-  
+  <body>  
   <p>
     <a href="/">首页</a>
     <a href="{{ book.update_link }}">更新</a>
     <a href="{{ book.catalog_link }}">目录</a>
   </p>
-
-  <p><b>{{ book.title }}</b> - {{ chapter.chapter_title}}</p>
-  
+  <p><b>{{ book.title }}</b> - {{ chapter.chapter_title}}</p>  
   <p>
     {% if book.prev_link %}
       <a href="{{ book.prev_link }}">上章</a> 
