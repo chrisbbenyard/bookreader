@@ -113,7 +113,7 @@
   <property name="title_re" type="null"></property>
   <property name="title_xpath" type="text">//h1</property>
   <property name="update_date_re" type="text">最后更新：(\d*)-(\d*)-(\d*)</property>
-  <property name="url_remove_prefix_re" type="text">/reader/</property>
+  <property name="url_remove_prefix_re" type="text">.*/</property>
   <property name="vol_and_chapter_xpath" type="text">//td[@class='vcss'] | //td[@class='ccss']/a</property>
   <property name="vol_vip_string" type="text"></property>
 </entity>

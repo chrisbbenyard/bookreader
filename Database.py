@@ -332,7 +332,7 @@ class Bookmark(db.Model):
       except: # 非法当前章节（至少现在的目录里面没有）
         print 'Error'
         print url
-        self.curr_url = None
+        #self.curr_url = None
         self.chapter_title = None
         self.next_url = None
         self.prev_url = None     
