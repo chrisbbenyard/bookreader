@@ -633,7 +633,7 @@ def task_get_chapter(url, catalog, reload = False):
   chapter = Database.Chapter.get_or_insert(chapter_url, catalog_ref = catalog)
   
   if chapter:
-    if reload or (not chapter.content_list): 
+    if reload or (not chapter.content_list) or (chapter.content_type == 'image'): 
       chapter_info = BookParser.get_data(chapter_url)
       chapter.put_info(chapter_info)
     return chapter
