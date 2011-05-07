@@ -268,7 +268,7 @@ def parse_chapter(chapter_url, parser):
     image_links = code['get_image_links'](html) 
     if image_links:
       put_into_dict(parse_result, 'content_list', image_links)
-
+      put_into_dict(parse_result, 'content_type', 'image')
     
   return parse_result
   

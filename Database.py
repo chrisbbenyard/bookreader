@@ -227,14 +227,17 @@ class Catalog(db.Model):
 class Chapter(db.Model):
   catalog_ref = db.ReferenceProperty(Catalog, collection_name = 'chapters', required=True)
 
+  content_type = db.TextProperty()        # 章节类型
   content_list = db.ListProperty(db.Text) # 章节内容（每段为一个单位，图片为一个单位）
-  chapter_title = db.TextProperty() # 章节标题，这个标题可能包含第几卷的卷名，和Catalog里面的有所不同
+  chapter_title = db.TextProperty()       # 章节标题，这个标题可能包含第几卷的卷名，和Catalog里面的有所不同
   
   def put_info(self, info): 
+    self.content_type = info.get('content_type')    
+    self.chapter_title = info.get('chapter_title')
+    
     if info.has_key('content_list'):  
-      self.content_list = [ db.Text(x) for x in info['content_list'] ]
-    if info.has_key('chapter_title'): 
-      self.chapter_title = info['chapter_title'] 
+      self.content_list = [ db.Text(x) for x in info['content_list'] ]   
+      
     self.put()
     
       
@@ -248,7 +251,6 @@ class Chapter(db.Model):
   def export_html(self):
     f = lambda x : ((x.find('http://')==0 and ['<img src="img/'+x+'"/><br/>']) or [u'<p>　　'+x+'</p>'])[0]    
     return ''.join( [f(x) for x in self.content_list] )
-
     
   def export_txt(self):
     return self.chapter_title + '\r\n' + ''.join( [u'\r\n　　'+x+'\r\n' for x in self.content_list] ) + '\r\n\r\n'
