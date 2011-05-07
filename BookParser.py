@@ -260,6 +260,7 @@ def parse_chapter(chapter_url, parser):
       
     paragraph_list = [x.strip() for x in paragraph_list if x.strip()] 
     put_into_dict(parse_result, 'content_list', paragraph_list)
+    put_into_dict(parse_result, 'content_type', 'text')    
 
   
   # 获取图片
