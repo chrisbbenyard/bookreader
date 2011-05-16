@@ -41,6 +41,10 @@ def get_re_first(html, r):
       return result[0]  
   return None
 
+def get_all_contents(node):
+  return ''.join( [unicode(x) for x in node.contents] )  
+  
+  
 # 获取的结构可能比较复杂，所以结果可能需要strip()
 def get_item(document, html, xpath_string, re_exp):
  if xpath_string and re_exp:
@@ -192,7 +196,7 @@ def parse_catalog(catalog_url, parser):
       # 判断是否解析到了VIP卷
       if not parser.vol_vip_string or unicode(i).find(parser.vol_vip_string) == -1:      
         chapter_url_list.append('') # 数据库的列表不能保存None    
-        chapter_title_list.append( i.contents[0] )    # contents[0]兼容性更强一些
+        chapter_title_list.append( get_all_contents(i) )   
       else:
         chapter_url_list.append('') # 数据库的列表不能保存None    
         chapter_title_list.append( parser.vol_vip_string )   
@@ -202,7 +206,7 @@ def parse_catalog(catalog_url, parser):
       if parser.url_remove_prefix_re:
         url = url_remove_prefix_re.sub('', url)
       chapter_url_list.append( url ) 
-      chapter_title_list.append( unicode(i.contents[0]) )
+      chapter_title_list.append( get_all_contents(i) )
         
   put_into_dict(parse_result, 'chapter_url_list', chapter_url_list)
   put_into_dict(parse_result, 'chapter_title_list', chapter_title_list)
