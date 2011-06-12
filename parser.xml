@@ -2,7 +2,7 @@
 <entity kind="Parser" key="agdyZWFkdHh0ciQLEgZQYXJzZXIiGGh0dHA6Ly9ib29rLnpvbmdoZW5nLmNvbQw">
   <key>tag:readtxt.gmail.com,2011-04-27:Parser[agdyZWFkdHh0ciQLEgZQYXJzZXIiGGh0dHA6Ly9ib29rLnpvbmdoZW5nLmNvbQw]</key>
   <property name="author_re" type="text"></property>
-  <property name="author_xpath" type="text">/html/body/div[2][@class='bodycon']/div[5][@class='wrap']/div[2][@class='mainarea']/div[1][@class='bortable']/div[1][@class='work']/div[1][@class='wright']/h1/em/a</property>
+  <property name="author_xpath" type="text">//div[@class='bortable']//h1/em/a</property>
   <property name="catalog2cover_re" type="text">/showchapter/</property>
   <property name="catalog2cover_string" type="text">/book/</property>
   <property name="chapter2cover_re" type="text">/chapter/(\d*)/\d*</property>
@@ -29,7 +29,7 @@
   <property name="site_short_name" type="text">纵横</property>
   <property name="site_url" type="text">http://www.zongheng.com</property>
   <property name="title_re" type="null"></property>
-  <property name="title_xpath" type="text">/html/body/div[2][@class='bodycon']/div[5][@class='wrap']/div[2][@class='mainarea']/div[1][@class='bortable']/div[1][@class='work']/div[1][@class='wright']/h1/a</property>
+  <property name="title_xpath" type="text">//div[@class='bortable']//h1/a</property>
   <property name="update_date_re" type="text">\s*(\d*)-(\d*)-(\d*)\s*(\d*):(\d*):(\d*)</property>
   <property name="url_remove_prefix_re" type="text">.*/</property>
   <property name="vol_and_chapter_xpath" type="text">//h2 | //div[@class='list']//a</property>
