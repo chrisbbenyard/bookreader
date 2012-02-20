@@ -46,11 +46,11 @@
   <property name="chapter_title_xpath" type="text">//h1</property>
   <property name="chapter_url_prefix_replace_re" type="text">(.*/).*</property>
   <property name="chapter_url_prefix_replace_string" type="text">http://www.du1du.com/\1</property>
-  <property name="content_extract_re" type="text">document\.write\('(.*?)'\);</property>
+  <property name="content_extract_re" type="text">document\.write(?:ln)?\('(.*?)'\);</property>
   <property name="content_link_code" type="text">
         def get_content_links(html):
           r = '\((\d*),\s*"(\d*\.txt)"\)'
-          f = lambda x: 'http://r.wl01.com:88/novel/' + str(int(x[0])/1000+1) + '/' + str(int(x[0])%1000) + '/' + x[1]
+          f = lambda x: 'http://t.hsttk.com/novel/' + str(int(x[0])/1000+1) + '/' + str(int(x[0])%1000) + '/' + x[1]
           return [f(x) for x in re.findall(r, html)]
   </property>  
   <property name="content_remove_re" type="text"></property>
