@@ -54,7 +54,7 @@
           return [f(x) for x in re.findall(r, html)]
   </property>  
   <property name="content_remove_re" type="text"></property>
-  <property name="content_split_re" type="text">&lt;br/&gt;</property>
+  <property name="content_split_re" type="text">&lt;br\s?/&gt;</property>
   <property name="content_xpath" type="text"></property>
   <property name="cover2catalog_re" type="text">.html</property>
   <property name="cover2catalog_string" type="text">/</property>
