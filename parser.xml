@@ -22,7 +22,7 @@
   <property name="identifier_cover" type="text">/book/</property>
   <property name="image_link_code" type="null"></property>
   <property name="last_url_remove_prefix_re" type="text">.*/</property>
-  <property name="last_url_xpath" type="text">//div[@id='gxzj']/div[2][@class='info']/h3/a</property>
+  <property name="last_url_xpath" type="text">//div[@class='info']/h3/a</property>
   <property name="site_coding" type="text">utf-8</property>
   <property name="site_description" type="text"></property>
   <property name="site_name" type="text">纵横中文网</property>
